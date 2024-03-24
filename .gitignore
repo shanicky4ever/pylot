@@ -17,3 +17,5 @@ erdos_pylot.egg-info/
 
 data*
 doc/*
+*.txt
+safeBench/
