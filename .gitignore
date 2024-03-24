@@ -13,3 +13,7 @@ pylot/prediction/prediction/
 .idea/
 venv/
 erdos_pylot.egg-info/
+*.conf
+
+data*
+doc/*
