@@ -1,5 +1,7 @@
 from absl import flags
 
+
+flags.DEFINE_list('goal_location', '234, 59, 39', 'Ego-vehicle goal location')
 # Detection flags.
 flags.DEFINE_list(
     'obstacle_detection_model_paths',
@@ -120,3 +122,5 @@ flags.DEFINE_list('tracking_metrics', [
     'num_misses', 'num_switches', 'num_false_positives', 'mota', 'motp',
     'mostly_tracked', 'mostly_lost', 'partially_tracked', 'idf1', 'num_objects'
 ], 'Tracking evaluation metrics')
+
+flags.DEFINE_float('obstacle_error',0.0,'nothing to say')

@@ -4,7 +4,9 @@ import os
 import erdos
 
 class WaypointsLoggerOperator(erdos.Operator):
-    def __init__(self, waypoints_stream: erdos.ReadStream, flags, file_base_name):
+    def __init__(self, waypoints_stream: erdos.ReadStream, 
+                 finished_indicator_stream: erdos.WriteStream,
+                 flags, file_base_name):
         waypoints_stream.add_callback(self.on_waypoints_update)
         self._flags = flags
         self._file_base_name = file_base_name
@@ -30,7 +32,11 @@ class WaypointsLoggerOperator(erdos.Operator):
                       outfile, indent=4, separators=(',', ': '))
     
     def _get_log_format(self, waypoints):
-        return [{
-            'x': wp.location.x,
-            'y': wp.location.y,
-        } for wp in waypoints]
+        wps = {}
+        speeds = list(waypoints.target_speeds)
+        for i,wp in enumerate(waypoints.waypoints):
+            wps[i] = {'x': wp.location.x, 'y': wp.location.y,
+                      'speed': speeds[i]}
+        return wps
+            
+    

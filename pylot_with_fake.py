@@ -52,9 +52,9 @@ flags.DEFINE_bool('log_predictions', False,
                   'True to enable prediction logging')
 flags.DEFINE_bool('log_predictions_fake', False,
                   'True to enable prediction logging')
-flags.DEFINE_bool('log_waypoints', False, 
+flags.DEFINE_bool('log_waypoints', False,
                   'True to enable waypoints logging')
-flags.DEFINE_bool('log_waypoints_fake', False, 
+flags.DEFINE_bool('log_waypoints_fake', False,
                   'True to enable waypoints logging')
 
 
@@ -260,7 +260,12 @@ def driver():
         lane_detection_stream, open_drive_stream, global_trajectory_stream,
         time_to_decision_loop_stream)
 
-    ### Add a pipeline for fake stream
+    if FLAGS.log_waypoints:
+        pylot.operator_creator.add_waypoints_logging(waypoints_stream,
+                                                     'waypoint')
+   
+   
+    # Add a pipeline for fake stream
 
     obstacles_stream_fake = pylot.component_creator.add_obstacle_detection_fake(
         obstacles_stream)
@@ -272,13 +277,6 @@ def driver():
         center_camera_stream, center_camera_setup, obstacles_stream_fake,
         depth_stream, vehicle_id_stream, pose_stream, ground_obstacles_stream,
         time_to_decision_loop_stream)
-    
-    # if FLAGS.log_trajectories_fake:
-    #     pylot.operator_creator.add_trajectory_logging(
-    #         obstacles_tracking_stream)
-    # if FLAGS.log_multiple_object_tracker:
-    #     pylot.operator_creator.add_multiple_object_tracker_logging(
-    #         obstacles_stream_fake)
         
     notify_streams_fake = []
     prediction_stream_fake, prediction_camera_stream_fake, notify_prediction_stream_fake = \
@@ -291,16 +289,20 @@ def driver():
     if notify_prediction_stream:
         notify_streams_fake.append(notify_prediction_stream_fake)
     
-    if FLAGS.log_predictions:
+    if FLAGS.log_predictions_fake:
         pylot.operator_creator.add_prediction_logging(prediction_stream_fake,
                                                       'predictions_fake')
 
-    waypoints_stream = pylot.component_creator.add_planning(
+    waypoints_stream_fake = pylot.component_creator.add_planning(
         goal_location, pose_stream, prediction_stream_fake, traffic_lights_stream,
         lane_detection_stream, open_drive_stream, global_trajectory_stream,
         time_to_decision_loop_stream)
+    
+    if FLAGS.log_waypoints_fake:
+        pylot.operator_creator.add_waypoints_logging(waypoints_stream_fake,
+                                                     'waypoint_fake')
 
-    ### End
+    # End
 
     if FLAGS.simulator_mode == "pseudo-asynchronous":
         # Add a synchronizer in the pseudo-asynchronous mode.

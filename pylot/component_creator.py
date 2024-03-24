@@ -5,6 +5,9 @@ from absl import flags
 import pylot.operator_creator
 from pylot.drivers.sensor_setup import DepthCameraSetup, RGBCameraSetup, \
     SegmentedCameraSetup
+import pylot.perception
+import pylot.perception.detection
+import pylot.perception.detection.detection_fake_operator
 
 FLAGS = flags.FLAGS
 
@@ -124,6 +127,12 @@ def add_obstacle_detection(center_camera_stream,
         obstacles_stream = ground_obstacles_stream
 
     return obstacles_stream, perfect_obstacles_stream
+
+def add_obstacle_detection_fake(obstacle_stream):
+    obstacle_detection_stream_fake = pylot.operator_creator.add_obstacle_detection_fake(
+        obstacle_stream
+    )
+    return obstacle_detection_stream_fake
 
 
 def add_traffic_light_detection(tl_transform,

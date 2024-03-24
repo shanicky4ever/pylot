@@ -9,7 +9,7 @@ import time
 import copy
 
 
-class DetectFakeOperator(erdos.Operator):
+class DetectionFakeOperator(erdos.Operator):
     def __init__(self, obstacls_stream, obstacles_fake_stream, flags):
         obstacls_stream.add_callback(self.on_obstacles_msg, [obstacles_fake_stream])
         self._obstacles_fake_stream = obstacles_fake_stream

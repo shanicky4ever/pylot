@@ -65,6 +65,16 @@ def add_obstacle_detection(camera_stream,
             FLAGS.obstacle_detection_model_paths[i], FLAGS)
     return obstacles_streams
 
+def add_obstacle_detection_fake(obstacle_strem):
+    from pylot.perception.detection.detection_fake_operator import DetectionFakeOperator
+    op_config = erdos.OperatorConfig(name='detection_fake_operator',
+                                     flow_watermarks=False,
+                                     log_file_name=FLAGS.log_file_name,
+                                     csv_log_file_name=FLAGS.csv_log_file_name,
+                                     profile_file_name=FLAGS.profile_file_name)
+    [obstacle_streams_fake] = erdos.connect(DetectionFakeOperator, op_config,
+                                            [obstacle_strem], FLAGS)
+    return obstacle_streams_fake
 
 def add_obstacle_location_finder(obstacles_stream, depth_stream, pose_stream,
                                  camera_setup):
@@ -991,3 +1001,26 @@ def add_time_to_decision(pose_stream, obstacles_stream):
     [time_to_decision] = erdos.connect(TimeToDecisionOperator, op_config,
                                        [pose_stream, obstacles_stream], FLAGS)
     return time_to_decision
+
+def add_prediction_logging(prediction_stream, file_base_name, name='prediction_logger_operator'):
+    from pylot.loggers.prediction_loggeer_operator import PredictionLoggerOperator
+    op_config = erdos.OperatorConfig(name=name,
+                                     log_file_name=FLAGS.log_file_name,
+                                     csv_log_file_name=FLAGS.csv_log_file_name,
+                                     profile_file_name=FLAGS.profile_file_name)
+    [finished_indicator_stream] = erdos.connect(PredictionLoggerOperator, op_config,
+                                                [prediction_stream],
+                                                FLAGS, file_base_name)
+    return finished_indicator_stream
+
+def add_waypoints_logging(waypoints_stream, file_base_name, name='waypoints_logging_operator'):
+    from pylot.loggers.waypoints_logger_operator import WaypointsLoggerOperator
+    op_config = erdos.OperatorConfig(name=name,
+                                     log_file_name=FLAGS.log_file_name,
+                                     csv_log_file_name=FLAGS.csv_log_file_name,
+                                     profile_file_name=FLAGS.profile_file_name)
+    [finished_indicator_stream] = erdos.connect(WaypointsLoggerOperator, op_config,
+                                                [waypoints_stream],
+                                                FLAGS, file_base_name)
+    return finished_indicator_stream
+

@@ -7,8 +7,8 @@ nohup zsh -c $PYLOT_HOME/scripts/run_simulator.sh > /tmp/carla.log 2>&1 &
 sleep 5s
 
 #num=0
-#for error in 0.2 0.4 0.6 0.8; do
-for error in 0.2; do
+for error in 0.2 0.4 0.6 0.8 0.0; do
+#for error in 0.2; do
     sed -i "s/--obstacle_error=.*/--obstacle_error=${error}/" $PYLOT_HOME/configs/myconf.conf
     #sed -i "s/--simulation_recording_file=data\/sc[0-9]*.log/--simulation_recording_file=data\/sc${num}.log/" $PYLOT_HOME/configs/myconf.conf
     #((num++))
