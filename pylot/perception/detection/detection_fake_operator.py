@@ -40,9 +40,10 @@ class DetectionFakeOperator(erdos.Operator):
             mid_x = (x_min + x_max) / 2
             mid_y = (y_min + y_max) / 2
             range_x, range_y = x_max - x_min, y_max - y_min
-            mid_y -= range_y * self._flags.obstacle_error
-            new_box = [ int(mid_y - range_y / 2), int(mid_x - range_x / 2),
-                        int(mid_y + range_y / 2), int(mid_x + range_x / 2)]
+            # mid_y -= range_y * self._flags.obstacle_error
+            # new_box = [ int(mid_y - range_y / 2), int(mid_x - range_x / 2),
+            #             int(mid_y + range_y / 2), int(mid_x + range_x / 2)]
+            new_box = self.__transform_bbox(mid_x, mid_y, range_x, range_y)
             bboxes_fake.append(Obstacle(
                 BoundingBox2D(new_box[1], new_box[3], new_box[0], new_box[2]),
                 obs.confidence, obs.label, obs.id
@@ -54,13 +55,13 @@ class DetectionFakeOperator(erdos.Operator):
         obstacles_fake_stream.send(
             erdos.WatermarkMessage(msg.timestamp))
         
-        # if self._flags.log_detector_output_fake:
-        #     self._msg_cnt += 1
-        #     if self._msg_cnt % self._flags.log_every_nth_message == 0:
-        #         msg.frame.annotate_with_bounding_boxes(msg.timestamp, bboxes_fake,
-        #                                                None, self._bbox_colors)
-        #         msg.frame.save(msg.timestamp.coordinates[0],
-        #                        # self._flags.data_path,
-        #                        self._data_path,
-        #                        'fake-detector-{}'.format(self.config.name))
-
+    def __transform_bbox(self, mid_x, mid_y, range_x, range_y):
+        if self._flags.obstacle_mutate == 'xleft':
+            mid_x -= range_x * self._flags.obstacle_error
+            new_box = [int(mid_y - range_y / 2), int(mid_x - range_x / 2),
+                       int(mid_y + range_y / 2), int(mid_x + range_x / 2)]
+        elif self._flags.obstacle_mutate == 'yup':
+            mid_y -= range_y * self._flags.obstacle_error
+            new_box = [int(mid_y - range_y / 2), int(mid_x - range_x / 2),
+                       int(mid_y + range_y / 2), int(mid_x + range_x / 2)]
+        return new_box

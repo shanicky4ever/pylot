@@ -123,4 +123,7 @@ flags.DEFINE_list('tracking_metrics', [
     'mostly_tracked', 'mostly_lost', 'partially_tracked', 'idf1', 'num_objects'
 ], 'Tracking evaluation metrics')
 
-flags.DEFINE_float('obstacle_error',0.0,'nothing to say')
+flags.DEFINE_float('obstacle_error', 0.0,
+                   'the value of the obstacle error')
+flags.DEFINE_enum('obstacle_mutate', 'yup',
+                  ['yup', 'xleft'], 'the mutate of the obstacle')
