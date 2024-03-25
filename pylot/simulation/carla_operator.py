@@ -116,7 +116,8 @@ class CarlaOperator(erdos.Operator):
                  self._flags.simulator_spawn_point_index,
                  self._flags.control == 'simulator_auto_pilot',
                  self._flags.simulator_num_people,
-                 self._flags.simulator_num_vehicles, self._logger)
+                 self._flags.simulator_num_vehicles, self._logger,
+                 must_points=self._flags.must_points)
 
         pylot.simulation.utils.set_vehicle_physics(
             self._ego_vehicle, self._flags.simulator_vehicle_moi,

@@ -167,9 +167,12 @@ def reset_world(world):
 
 def spawn_actors(client, world, traffic_manager_port: int,
                  simulator_version: str, ego_spawn_point_index: int,
-                 auto_pilot: bool, num_people: int, num_vehicles: int, logger):
+                 auto_pilot: bool, num_people: int, num_vehicles: int, logger,
+                 must_points=[]):
+    must_spawn_points = [int(mp) for mp in must_points]
+    assert ego_spawn_point_index not in must_points
     vehicle_ids = spawn_vehicles(client, world, traffic_manager_port,
-                                 num_vehicles, logger)
+                                 num_vehicles, logger, must_spawn_points)
     ego_vehicle = spawn_ego_vehicle(world, traffic_manager_port,
                                     ego_spawn_point_index, auto_pilot)
     people = []
@@ -274,7 +277,7 @@ def spawn_people(client, world, num_people: int, logger):
 
 
 def spawn_vehicles(client, world, traffic_manager_port: int, num_vehicles: int,
-                   logger):
+                   logger, must_spawn_points=[]):
     """ Spawns vehicles at random locations inside the world.
 
     Args:
@@ -285,6 +288,7 @@ def spawn_vehicles(client, world, traffic_manager_port: int, num_vehicles: int,
     # Get the spawn points and ensure that the number of vehicles
     # requested are less than the number of spawn points.
     spawn_points = world.get_map().get_spawn_points()
+    must_spawn = [spawn_points[int(mp)] for mp in must_spawn_points]
     if num_vehicles >= len(spawn_points):
         logger.warning(
             'Requested {} vehicles but only found {} spawn points'.format(
@@ -298,7 +302,7 @@ def spawn_vehicles(client, world, traffic_manager_port: int, num_vehicles: int,
 
     # Construct a batch message that spawns the vehicles.
     batch = []
-    for transform in spawn_points[:num_vehicles]:
+    for transform in must_spawn+spawn_points[:num_vehicles]:
         blueprint = random.choice(v_blueprints)
 
         # Change the color of the vehicle.

@@ -122,3 +122,6 @@ flags.register_multi_flags_validator(
     ],
     sensor_frequency_validator,
     message='Sensor frequencies cannot be greater than --simulator_fps')
+
+flags.DEFINE_list('must_points', '',
+                  'npc vehicles must occurs in these points')
