@@ -36,5 +36,3 @@ timeout 420s python $PYLOT_HOME/pylot_with_fake.py --flagfile $PYLOT_HOME/config
 kill -9 $(ps -ef|grep pylot_with|gawk '$0 !~/grep/ {print $2}' |tr -s '\n' ' ')
 
 python $PYLOT_HOME/script_exp/get_event.py event.txt $name
-
-sleep 5s

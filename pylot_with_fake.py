@@ -14,8 +14,8 @@ from pylot.drivers.sensor_setup import DepthCameraSetup, RGBCameraSetup, \
     SegmentedCameraSetup
 from pylot.simulation.utils import get_world, set_asynchronous_mode
 
-from datetime import datetime
 import os
+import shutil
 
 #flags.DEFINE_list('goal_location', '234, 59, 39', 'Ego-vehicle goal location')
 flags.DEFINE_bool('log_rgb_camera', False,
@@ -377,8 +377,11 @@ def shutdown(sig, frame):
 
 
 def main(args):
-    current_time = datetime.now().strftime("%m-%d-%H-%M-%S")
-    FLAGS.data_path = os.path.join(FLAGS.data_path,current_time)
+    # current_time = datetime.now().strftime("%m-%d-%H-%M-%S")
+    # FLAGS.data_path = os.path.join(FLAGS.data_path,current_time)
+    if os.path.exists(FLAGS.data_path):
+        shutil.rmtree(FLAGS.data_path)
+    os.makedirs(FLAGS.data_path)
     # Connect an instance to the simulator to make sure that we can turn the
     # synchronous mode off after the script finishes running.
     client, world = get_world(FLAGS.simulator_host, FLAGS.simulator_port,
