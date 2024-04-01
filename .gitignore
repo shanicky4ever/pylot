@@ -19,3 +19,6 @@ data*
 doc/*
 *.txt
 safeBench/
+
+*.png
+*.jpg
