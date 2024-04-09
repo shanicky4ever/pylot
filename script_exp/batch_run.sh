@@ -38,7 +38,7 @@ for mutate in yup xleft; do
             sed -i "s#--data_path=.*#--data_path=data\/${mutate}_${dt}_${error}#" $PYLOT_HOME/configs/myconf.conf
             zsh $PYLOT_HOME/script_exp/get_event.sh -c $CUDA_VISIBLE_DEVICES_CARLA -p $CUDA_VISIBLE_DEVICES_PYLOT -n "obstacle_error=${error}"
             echo "${error} done"
-            sleep 1m|pv -t
+            sleep 5s|pv -t
         done
     done
 done

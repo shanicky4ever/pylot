@@ -1,5 +1,7 @@
 rm pylot.log
 
+export TF_CPP_MIN_LOG_LEVEL=1
+
 carla_device=0
 pylot_device=0
 name="test"
