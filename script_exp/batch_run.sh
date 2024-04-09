@@ -28,14 +28,19 @@ sleep 5s |pv -t
 
 #num=0
 
-for mutate in yup xleft; do
+for mutate in zoomout xleft yup; do
     sed -i "s/--obstacle_mutate=.*/--obstacle_mutate=${mutate}/" $PYLOT_HOME/configs/myconf.conf
     for dt in depth_camera lidar; do
         sed -i "s/obstacle_location_finder_sensor=.*/obstacle_location_finder_sensor=${dt}/" $PYLOT_HOME/configs/myconf.conf
-        for error in 0.02 0.04 0.08 0.15; do
+        for error in 0.02 0.04 0.08 0.10 0.15; do
         #for error in 0.6; do
+            data_path="data/${mutate}_${dt}_${error}"
+            if [ -d $data_path ]; then
+                rm -rf $data_path
+            fi
+            mkdir -p $data_path
             sed -i "s/--obstacle_error=.*/--obstacle_error=${error}/" $PYLOT_HOME/configs/myconf.conf
-            sed -i "s#--data_path=.*#--data_path=data\/${mutate}_${dt}_${error}#" $PYLOT_HOME/configs/myconf.conf
+            sed -i "s#--data_path=.*#--data_path=${data_path}#" $PYLOT_HOME/configs/myconf.conf
             zsh $PYLOT_HOME/script_exp/get_event.sh -c $CUDA_VISIBLE_DEVICES_CARLA -p $CUDA_VISIBLE_DEVICES_PYLOT -n "obstacle_error=${error}"
             echo "${error} done"
             sleep 5s|pv -t

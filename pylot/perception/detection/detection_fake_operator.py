@@ -22,7 +22,7 @@ class DetectionFakeOperator(erdos.Operator):
     def connect(obstacles_stream):
         obstacles_fake_stream = erdos.WriteStream()
         return [obstacles_fake_stream]
-    
+
     def destroy(self):
         self._obstacles_fake_stream.send(
             erdos.WatermarkMessage(erdos.Timestamp(is_top=True)))
@@ -54,7 +54,7 @@ class DetectionFakeOperator(erdos.Operator):
             ObstaclesMessage(msg.timestamp, bboxes_fake, runtime))
         obstacles_fake_stream.send(
             erdos.WatermarkMessage(msg.timestamp))
-        
+
     def __transform_bbox(self, mid_x, mid_y, range_x, range_y):
         if self._flags.obstacle_mutate == 'xleft':
             mid_x -= range_x * self._flags.obstacle_error
@@ -64,4 +64,11 @@ class DetectionFakeOperator(erdos.Operator):
             mid_y -= range_y * self._flags.obstacle_error
             new_box = [int(mid_y - range_y / 2), int(mid_x - range_x / 2),
                        int(mid_y + range_y / 2), int(mid_x + range_x / 2)]
+        elif self._flags.obstacle_mutate == 'zoomout':
+            new_range_x = range_x * (1 - self._flags.obstacle_error)
+            new_range_y = range_y * (1 - self._flags.obstacle_error)
+            new_box = [int(mid_y - new_range_y / 2), int(mid_x - new_range_x / 2),
+                       int(mid_y + new_range_y / 2), int(mid_x + new_range_x / 2)]
+        else:
+            raise ValueError('Unknown obstacle mutation type {}'.format(self._flags.obstacle_mutate))
         return new_box

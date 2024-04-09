@@ -126,4 +126,4 @@ flags.DEFINE_list('tracking_metrics', [
 flags.DEFINE_float('obstacle_error', 0.0,
                    'the value of the obstacle error')
 flags.DEFINE_enum('obstacle_mutate', 'yup',
-                  ['yup', 'xleft'], 'the mutate of the obstacle')
+                  ['yup', 'xleft', 'zoomout'], 'the mutate of the obstacle')
