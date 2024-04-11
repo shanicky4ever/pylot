@@ -59,10 +59,10 @@ class DetectionOperator(erdos.Operator):
         self._bbox_colors = load_coco_bbox_colors(self._coco_labels)
         # Unique bounding box id. Incremented for each bounding box.
         self._unique_id = 0
-
-        self._msg_cnt = 0
-        self._data_path = os.path.join(self._flags.data_path, 'detector')
-        os.makedirs(self._data_path, exist_ok=True)
+        if self._flags.log_detector_output:
+            self._msg_cnt = 0
+            self._data_path = os.path.join(self._flags.data_path, 'detector')
+            os.makedirs(self._data_path, exist_ok=True)
 
         # Serve some junk image to load up the model.
         self.__run_model(np.zeros((108, 192, 3), dtype='uint8'))
