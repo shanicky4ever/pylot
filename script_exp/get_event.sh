@@ -1,4 +1,5 @@
 rm pylot.log
+rm pylot.csv
 
 export TF_CPP_MIN_LOG_LEVEL=1
 
