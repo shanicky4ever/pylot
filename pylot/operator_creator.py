@@ -1024,3 +1024,14 @@ def add_waypoints_logging(waypoints_stream, file_base_name, name='waypoints_logg
                                                 FLAGS, file_base_name)
     return finished_indicator_stream
 
+def add_obstacle_with_location_logging(obstacle_with_location_stream, file_base_name, name='obstacle_with_location_logging_operator'):
+    from pylot.loggers.obstacle_with_location_logger_operator import ObstacleLocationLoggerOperator
+    op_config = erdos.OperatorConfig(name=name,
+                                     log_file_name=FLAGS.log_file_name,
+                                     csv_log_file_name=FLAGS.csv_log_file_name,
+                                     profile_file_name=FLAGS.profile_file_name)
+    [finished_indicator_stream] = erdos.connect(ObstacleLocationLoggerOperator, op_config,
+                                                [obstacle_with_location_stream],
+                                                FLAGS, file_base_name)
+    return finished_indicator_stream
+

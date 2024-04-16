@@ -134,6 +134,11 @@ def add_obstacle_detection_fake(obstacle_stream):
     )
     return obstacle_detection_stream_fake
 
+def add_obstacle_with_location(obstacle_stream, depth_stream, pose_stream, camera_setup):
+    obstacles_with_location_stream = pylot.operator_creator.add_obstacle_location_finder(
+        obstacle_stream, depth_stream, pose_stream, camera_setup
+    )
+    return obstacles_with_location_stream
 
 def add_traffic_light_detection(tl_transform,
                                 vehicle_id_stream,
