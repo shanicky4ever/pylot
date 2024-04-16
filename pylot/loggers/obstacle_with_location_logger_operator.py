@@ -23,7 +23,7 @@ class ObstacleLocationLoggerOperator(erdos.Operator):
         self._msg_cnt += 1
         if self._msg_cnt % self._flags.log_every_nth_message != 0:
             return
-        obstacles_with_location = [obstacle_with_location for obstacle_with_location in msg.obstacles_with_location]
+        obstacles_with_location = [obs for obs in msg.obstacles]
         assert len(msg.timestamp.coordinates) == 1
         timestamp = msg.timestamp.coordinates[0]
         file_name = os.path.join(self._data_path,
@@ -33,7 +33,8 @@ class ObstacleLocationLoggerOperator(erdos.Operator):
 
     def _get_log_format(self, obstacles_with_location):
         return [{
-            'x': obs.location.x,
-            'y': obs.location.y,
+            'x': obs.transform.location.x,
+            'y': obs.transform.location.y,
+            'z': obs.transform.location.z,
             'id': obs.id,
         } for obs in obstacles_with_location]
