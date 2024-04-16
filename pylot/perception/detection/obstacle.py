@@ -240,8 +240,14 @@ class Obstacle(object):
                 'Obstacle {} does not have 2D bounding box'.format(self.id))
         min_point = self.bounding_box_2D.get_min_point()
         max_point = self.bounding_box_2D.get_max_point()
-        return (self.label, self.detailed_label, self.id,
-                ((min_point.x, min_point.y), (max_point.x, max_point.y)))
+        # return (self.label, self.detailed_label, self.id,
+        #         ((min_point.x, min_point.y), (max_point.x, max_point.y)))
+        return {
+            'label': self.label,
+            'detailed_label': self.detailed_label,
+            'id': self.id,
+            'bounding_box': ((min_point.x, min_point.y), (max_point.x, max_point.y))
+        }
 
     def is_animal(self):
         return self.label in [
