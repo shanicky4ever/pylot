@@ -36,5 +36,6 @@ class PredictionLoggerOperator(erdos.Operator):
         return [[{
             'x': pred_t.location.x,
             'y': pred_t.location.y,
+            'z': pred_t.location.z,
         } for pred_t in pred] for pred in prediction]
     

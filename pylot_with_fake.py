@@ -56,7 +56,8 @@ flags.DEFINE_bool('log_waypoints', False,
                   'True to enable waypoints logging')
 flags.DEFINE_bool('log_waypoints_fake', False,
                   'True to enable waypoints logging')
-
+flags.DEFINE_bool('log_obstacle_with_location', False,
+                  'True to enable obstacle with location logging')
 
 FLAGS = flags.FLAGS
 
@@ -226,6 +227,12 @@ def driver():
         depth_stream, vehicle_id_stream, pose_stream, ground_obstacles_stream,
         time_to_decision_loop_stream)
     
+    if FLAGS.log_obstacle_with_location:
+        obs_with_loc_stream = pylot.component_creator.add_obstacle_with_location(
+            obstacles_stream, depth_stream, pose_stream, center_camera_setup)
+        pylot.operator_creator.add_obstacle_with_location_logging(
+            obs_with_loc_stream, 'obstacles_with_location')
+    
     if FLAGS.log_trajectories:
         pylot.operator_creator.add_trajectory_logging(
             obstacles_tracking_stream)
@@ -277,6 +284,12 @@ def driver():
         center_camera_stream, center_camera_setup, obstacles_stream_fake,
         depth_stream, vehicle_id_stream, pose_stream, ground_obstacles_stream,
         time_to_decision_loop_stream)
+
+    if FLAGS.log_obstacle_with_location:
+        obs_with_loc_stream_fake = pylot.component_creator.add_obstacle_with_location(
+            obstacles_stream_fake, depth_stream, pose_stream, center_camera_setup)
+        pylot.operator_creator.add_obstacle_with_location_logging(
+            obs_with_loc_stream_fake, 'obstacles_with_location_fake')
         
     notify_streams_fake = []
     prediction_stream_fake, prediction_camera_stream_fake, notify_prediction_stream_fake = \
