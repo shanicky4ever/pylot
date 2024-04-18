@@ -171,10 +171,10 @@ def spawn_actors(client, world, traffic_manager_port: int,
                  must_points=[]):
     must_spawn_points = [int(mp) for mp in must_points]
     assert ego_spawn_point_index not in must_points
-    vehicle_ids = spawn_vehicles(client, world, traffic_manager_port,
-                                 num_vehicles, logger, must_spawn_points)
     ego_vehicle = spawn_ego_vehicle(world, traffic_manager_port,
                                     ego_spawn_point_index, auto_pilot)
+    vehicle_ids = spawn_vehicles(client, world, traffic_manager_port,
+                                 num_vehicles, logger, must_spawn_points)
     people = []
 
     if check_simulator_version(simulator_version,
@@ -288,7 +288,9 @@ def spawn_vehicles(client, world, traffic_manager_port: int, num_vehicles: int,
     # Get the spawn points and ensure that the number of vehicles
     # requested are less than the number of spawn points.
     spawn_points = world.get_map().get_spawn_points()
-    must_spawn = [spawn_points[int(mp)] for mp in must_spawn_points]
+    must_spawn = []
+    if must_spawn_points:
+        must_spawn = [spawn_points[int(mp)] for mp in must_spawn_points]
     if num_vehicles >= len(spawn_points):
         logger.warning(
             'Requested {} vehicles but only found {} spawn points'.format(
