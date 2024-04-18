@@ -37,7 +37,7 @@ nohup zsh -c $PYLOT_HOME/scripts/run_simulator.sh > /tmp/carla.log 2>&1 &
 sleep 5s |pv -t
 
 export CUDA_VISIBLE_DEVICES=$pylot_device
-timeout 420s python $PYLOT_HOME/pylot_with_fake.py --flagfile $PYLOT_HOME/configs/myconf.conf
+timeout 480s python $PYLOT_HOME/pylot_with_fake.py --flagfile $PYLOT_HOME/configs/myconf.conf
 
 kill -9 $(ps -ef|grep carla|gawk '$0 !~/grep/ {print $2}' |tr -s '\n' ' ')
 kill -9 $(ps -ef|grep pylot_with|gawk '$0 !~/grep/ {print $2}' |tr -s '\n' ' ')

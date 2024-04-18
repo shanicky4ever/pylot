@@ -148,6 +148,8 @@ flags.DEFINE_bool(
 flags.DEFINE_integer('top_down_camera_altitude', 40,
                      'Altitude of the top-down world camera (in meters).')
 
+flags.DEFINE_bool('ignore_traffic_light', False,
+                  'True to ignore traffic light state')
 
 ########################################
 # Recording operators.

@@ -118,6 +118,11 @@ class CarlaOperator(erdos.Operator):
                  self._flags.simulator_num_people,
                  self._flags.simulator_num_vehicles, self._logger,
                  must_points=self._flags.must_points)
+        
+        if self._flags.ignore_traffic_light:
+            for veh in self._vehicle_ids:
+                vehicle = self._world.get_actor(veh)
+                self._traffic_manager.ignore_lights_percentage(vehicle, 100)
 
         pylot.simulation.utils.set_vehicle_physics(
             self._ego_vehicle, self._flags.simulator_vehicle_moi,
