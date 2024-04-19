@@ -38,5 +38,5 @@ class ObstacleLocationLoggerOperator(erdos.Operator):
             'z': obs.transform.location.z,
             'id': obs.id,
             'label': obs.label,
-            'confidence': obs.confidence,
+            'confidence': float(obs.confidence.numpy()),
         } for obs in obstacles_with_location]
