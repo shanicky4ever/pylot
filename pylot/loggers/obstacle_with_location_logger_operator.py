@@ -37,4 +37,5 @@ class ObstacleLocationLoggerOperator(erdos.Operator):
             'y': obs.transform.location.y,
             'z': obs.transform.location.z,
             'id': obs.id,
+            'label': obs.label,
         } for obs in obstacles_with_location]
