@@ -7,6 +7,7 @@ import os
 
 import time
 import copy
+from random import random
 
 
 class DetectionFakeOperator(erdos.Operator):
@@ -69,6 +70,19 @@ class DetectionFakeOperator(erdos.Operator):
             new_range_y = range_y * (1 - self._flags.obstacle_error)
             new_box = [int(mid_y - new_range_y / 2), int(mid_x - new_range_x / 2),
                        int(mid_y + new_range_y / 2), int(mid_x + new_range_x / 2)]
+        elif self._flags.obstacle_mutate == 'random':
+            mid_x +=  2*(random() - 0.5) * self._flags.obstacle_error * 1920
+            mid_y +=  2*(random() - 0.5) * self._flags.obstacle_error * 1080
+            new_range_x = range_x + range_x * 2*(random()-0.5) * self._flags.obstacle_error
+            new_range_y = range_y + range_y * 2*(random()-0.5) * self._flags.obstacle_error
+            new_box = [int(mid_y - new_range_y / 2), int(mid_x - new_range_x / 2),
+                       int(mid_y + new_range_y / 2), int(mid_x + new_range_x / 2)]
         else:
             raise ValueError('Unknown obstacle mutation type {}'.format(self._flags.obstacle_mutate))
+        new_box = [
+            max(0, new_box[0]),
+            max(0, new_box[1]),
+            min(1080, new_box[2]),
+            min(1920, new_box[3])
+        ]
         return new_box
