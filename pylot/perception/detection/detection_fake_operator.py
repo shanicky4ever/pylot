@@ -71,8 +71,8 @@ class DetectionFakeOperator(erdos.Operator):
             new_box = [int(mid_y - new_range_y / 2), int(mid_x - new_range_x / 2),
                        int(mid_y + new_range_y / 2), int(mid_x + new_range_x / 2)]
         elif self._flags.obstacle_mutate == 'random':
-            mid_x +=  2*(random() - 0.5) * self._flags.obstacle_error * 1920
-            mid_y +=  2*(random() - 0.5) * self._flags.obstacle_error * 1080
+            mid_x +=  0.1*(random() - 0.5) * self._flags.obstacle_error * 1920
+            mid_y +=  0.1*(random() - 0.5) * self._flags.obstacle_error * 1080
             new_range_x = range_x + range_x * 2*(random()-0.5) * self._flags.obstacle_error
             new_range_y = range_y + range_y * 2*(random()-0.5) * self._flags.obstacle_error
             new_box = [int(mid_y - new_range_y / 2), int(mid_x - new_range_x / 2),
