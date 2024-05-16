@@ -39,7 +39,8 @@ class FOTPlanner(Planner):
             "kt": flags.kt,
             "ko": flags.ko,
             "klat": flags.klat,
-            "klon": flags.klon
+            "klon": flags.klon,
+            "num_threads": 8
         }
 
     def fot_parameters_using_99_percentile(self, ttd):

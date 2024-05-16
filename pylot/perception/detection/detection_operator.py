@@ -12,8 +12,8 @@ from pylot.perception.detection.utils import BoundingBox2D, \
     OBSTACLE_LABELS, load_coco_bbox_colors, load_coco_labels
 from pylot.perception.messages import ObstaclesMessage
 
-import tensorflow as tf
-
+#import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 class DetectionOperator(erdos.Operator):
     """Detects obstacles using a TensorFlow model.
@@ -74,6 +74,8 @@ class DetectionOperator(erdos.Operator):
         self._unique_id = 0
         # Serve some junk image to load up the model.
         self.__run_model(np.zeros((108, 192, 3)))
+
+        self.number=0
 
     @staticmethod
     def connect(camera_stream, time_to_decision_stream):
@@ -152,10 +154,12 @@ class DetectionOperator(erdos.Operator):
         obstacles_stream.send(erdos.WatermarkMessage(msg.timestamp))
 
         if self._flags.log_detector_output:
-            msg.frame.annotate_with_bounding_boxes(msg.timestamp, obstacles,
-                                                   None, self._bbox_colors)
-            msg.frame.save(msg.timestamp.coordinates[0], self._flags.data_path,
-                           'detector-{}'.format(self.config.name))
+            self.number+=1
+            if self.number%40==0:
+                msg.frame.annotate_with_bounding_boxes(msg.timestamp, obstacles,
+                                                    None, self._bbox_colors)
+                msg.frame.save(msg.timestamp.coordinates[0], self._flags.data_path,
+                            'detector-{}'.format(self.config.name))
 
     def __run_model(self, image_np):
         # Expand dimensions since the model expects images to have
