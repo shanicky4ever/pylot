@@ -1035,3 +1035,13 @@ def add_obstacle_with_location_logging(obstacle_with_location_stream, file_base_
                                                 FLAGS, file_base_name)
     return finished_indicator_stream
 
+
+def add_obstacle_tracking_logging(obstacle_tracking_stream, file_base_name, name='obstacle_tracking_logger'):
+    from pylot.loggers.obstacle_tracking_logger_operator import ObstacleTrackingOperator
+    op_config = erdos.OperatorConfig(name=name,
+                                     log_file_name=FLAGS.log_file_name,
+                                     csv_log_file_name=FLAGS.csv_log_file_name,
+                                     profile_file_name=FLAGS.profile_file_name)
+    [finished_indicator_stream] = erdos.connect(ObstacleTrackingOperator, op_config,
+                                                [obstacle_tracking_stream],
+                                                FLAGS, file_base_name)

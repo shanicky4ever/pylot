@@ -58,6 +58,8 @@ flags.DEFINE_bool('log_waypoints_fake', False,
                   'True to enable waypoints logging')
 flags.DEFINE_bool('log_obstacle_with_location', False,
                   'True to enable obstacle with location logging')
+flags.DEFINE_bool('log_obstacle_history', False,
+                  'True to enable obstacle history logging')
 
 FLAGS = flags.FLAGS
 

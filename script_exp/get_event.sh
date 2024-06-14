@@ -34,14 +34,14 @@ echo $name >> event.txt
 
 export CUDA_VISIBLE_DEVICES=$carla_device
 nohup zsh -c $PYLOT_HOME/scripts/run_simulator.sh > /tmp/carla.log 2>&1 &
-sleep 5s |pv -t
+sleep 10s |pv -t
 
 export CUDA_VISIBLE_DEVICES=$pylot_device
-timeout 480s python $PYLOT_HOME/pylot_with_fake.py --flagfile $PYLOT_HOME/configs/myconf.conf
+timeout 480s python $PYLOT_HOME/pylot_with_log.py --flagfile $PYLOT_HOME/configs/myconf.conf
 
 kill -9 $(ps -ef|grep carla|gawk '$0 !~/grep/ {print $2}' |tr -s '\n' ' ')
 kill -9 $(ps -ef|grep pylot_with|gawk '$0 !~/grep/ {print $2}' |tr -s '\n' ' ')
 
 #python $PYLOT_HOME/script_exp/get_event.py event.txt $name
 
-unset CUDA_VISIBLE_DEVICES
+#unset CUDA_VISIBLE_DEVICES

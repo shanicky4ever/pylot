@@ -6,7 +6,8 @@ import pylot.utils
 from pylot.perception.detection.utils import get_obstacle_locations
 from pylot.perception.messages import ObstacleTrajectoriesMessage
 from pylot.perception.tracking.obstacle_trajectory import ObstacleTrajectory
-
+import os
+import pickle
 
 class ObstacleLocationHistoryOperator(erdos.Operator):
     def __init__(self, obstacles_stream, depth_stream, pose_stream,
@@ -101,6 +102,7 @@ class ObstacleLocationHistoryOperator(erdos.Operator):
                 if len(self._obstacle_history[obstacle_id]) == 0:
                     del self._obstacle_history[obstacle_id]
             del self._timestamp_to_id[gc_timestamp]
+
 
     def on_obstacles_update(self, msg):
         self._logger.debug('@{}: obstacles update'.format(msg.timestamp))
