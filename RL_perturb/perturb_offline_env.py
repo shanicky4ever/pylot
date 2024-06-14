@@ -1,7 +1,7 @@
 import gym
 import pathlib
 from util.fileutils import load_json
-from util.obstalce import get_init_obstacle
+from util.obstacle import get_init_obstacle
 
 
 class OfflinePerturbDetectionENV(gym.Env):

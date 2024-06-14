@@ -1,7 +1,7 @@
 from json import load
 import pathlib
 from util.fileutils import load_pickle, load_json
-from util.obstalce import replace_latest_trajectories, abstact_tracking_info, find_obs_in_trajectory, get_init_obstacle
+from util.obstacle import abstact_tracking_info, get_init_obstacle, build_obstacle_from_bbox_info, find_obs_in_trajectory, replace_latest_trajectories
 from pylot.utils import Transform, Location, Rotation
 from pylot.perception.depth_frame import DepthFrame
 from pylot.drivers.sensor_setup import DepthCameraSetup, RGBCameraSetup
@@ -34,21 +34,15 @@ class PylotAfterPerecptionHandler:
         self.trajectories_data = load_json(self.profile_data_folder.joinpath(
             'trajectories').joinpath(f"trajectories-{self.timestamp}.json"))
         self.trajectories = abstact_tracking_info(self.trajectories_data)
-        for t, v in self.trajectories.items():
-            print(v[-1])
-            print(t)
 
         init_obs = get_init_obstacle(self.profile_data_folder, self.timestamp)
         self.obs_in_traj_info = find_obs_in_trajectory(self.trajectories, init_obs,
             depth_frame=self.depth_frame, ego_transform=self.ego_transform)
-        new_trajectories = replace_latest_trajectories(self.trajectories, init_obs,
-            depth_frame=self.depth_frame, ego_transform=self.ego_transform, obs_in_traj_info=self.obs_in_traj_info)
-        for t, v in new_trajectories.items():
-            print(v[-1])
-            print(t)
+        # new_trajectories = replace_latest_trajectories(self.trajectories, init_obs,
+        #     depth_frame=self.depth_frame, ego_transform=self.ego_transform, obs_in_traj_info=self.obs_in_traj_info)
 
-    def step(self, obstacles):
-        pass
-        # new_history_tracking_data = replace_latest_obstacle_history(
-        #     self.trajectories, obstacles,
-        #     depth_frame=self.depth_frame, ego_transform=self.ego_transform)
+    def step(self, bbox):
+        new_obs = build_obstacle_from_bbox_info(bbox)
+        new_trajectories = replace_latest_trajectories(self.trajectories, new_obs,
+            depth_frame=self.depth_frame, ego_transform=self.ego_transform, obs_in_traj_info=self.obs_in_traj_info)
+

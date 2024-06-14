@@ -6,6 +6,7 @@ from .fileutils import load_json
 from pylot.utils import Vector2D, Transform, Rotation, Location
 import numpy as np
 import re
+from copy import deepcopy
 
 
 def get_init_obstacle(base_dir, timestamp):
@@ -25,6 +26,7 @@ def build_obstacle_from_bbox_info(bboxes: List):
 
 
 def replace_latest_trajectories(trajectories, obstacles: List, depth_frame, ego_transform: Transform, obs_in_traj_info):
+    new_trajectories = deepcopy(trajectories)
     for ob in obstacles:
         if ob.id not in obs_in_traj_info:
             continue
@@ -34,22 +36,10 @@ def replace_latest_trajectories(trajectories, obstacles: List, depth_frame, ego_
         new_location.x += obs_in_traj_info[ob.id]['x']
         new_location.y += obs_in_traj_info[ob.id]['y']
         new_location.z += obs_in_traj_info[ob.id]['z']
-        trajectories[obs_in_traj_info[ob.id]['traj']][-1].location =\
+        new_trajectories[obs_in_traj_info[ob.id]['traj']][-1].location =\
             Location(new_location.x, new_location.y, new_location.z)
-    return trajectories
+    return new_trajectories
 
-
-
-
-    obstacle_ids = [o.id for o in obstacles]
-    for h in history:
-        if h.obstacle.id == obstacle_ids:
-            obs_with_transform = get_obstacle_location(h.obstacle, depth_frame, ego_transform.location)
-            new_location = ego_transform.inverse_transform_locations(
-                [obs_with_transform.trasnform.location])[0]
-            print(new_location)
-            # h.cur_obstacle_trajectory[-1] = Transform(new_location, Rotation())
-    return history
 
 def find_obs_in_trajectory(trajectories: Dict, obstacles: List, depth_frame, ego_transform: Transform):
     obs_in_traj_info = {}
