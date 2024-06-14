@@ -14,6 +14,7 @@ from pylot.simulation.utils import get_world, set_asynchronous_mode
 
 from datetime import datetime
 import os
+import shutil
 
 #flags.DEFINE_list('goal_location', '234, 59, 39', 'Ego-vehicle goal location')
 flags.DEFINE_bool('log_rgb_camera', False,
@@ -42,6 +43,20 @@ flags.DEFINE_bool('log_chauffeur', False,
 flags.DEFINE_bool('log_top_down_segmentation', False,
                   'True to enable logging of top down segmentation')
 
+flags.DEFINE_bool('log_obstacles_fake', False,
+                  'True to enable obstacle bounding box logging')
+flags.DEFINE_bool('log_predictions', False,
+                  'True to enable prediction logging')
+flags.DEFINE_bool('log_predictions_fake', False,
+                  'True to enable prediction logging')
+flags.DEFINE_bool('log_waypoints', False,
+                  'True to enable waypoints logging')
+flags.DEFINE_bool('log_waypoints_fake', False,
+                  'True to enable waypoints logging')
+flags.DEFINE_bool('log_obstacle_with_location', False,
+                  'True to enable obstacle with location logging')
+flags.DEFINE_bool('log_obstacle_history', False,
+                  'True to enable obstacle history logging')
 
 FLAGS = flags.FLAGS
 
@@ -214,6 +229,10 @@ def driver():
         depth_stream, vehicle_id_stream, pose_stream, ground_obstacles_stream,
         time_to_decision_loop_stream)
     
+    # if FLAGS.log_obstacle_history:
+    #     pylot.operator_creator.add_obstacle_tracking_logging(obstacles_stream,
+    #                                                          file_base_name='obstacle_tracking')
+
     if FLAGS.log_trajectories:
         pylot.operator_creator.add_trajectory_logging(
             obstacles_tracking_stream)
@@ -243,6 +262,10 @@ def driver():
         goal_location, pose_stream, prediction_stream, traffic_lights_stream,
         lane_detection_stream, open_drive_stream, global_trajectory_stream,
         time_to_decision_loop_stream)
+
+    if FLAGS.log_waypoints:
+        pylot.operator_creator.add_waypoints_logging(waypoints_stream,
+                                                     'waypoint')
 
     if FLAGS.simulator_mode == "pseudo-asynchronous":
         # Add a synchronizer in the pseudo-asynchronous mode.
@@ -317,8 +340,9 @@ def shutdown(sig, frame):
 
 
 def main(args):
-    current_time = datetime.now().strftime("%m-%d-%H-%M-%S")
-    FLAGS.data_path = os.path.join(FLAGS.data_path,current_time)
+    if os.path.exists(FLAGS.data_path):
+        shutil.rmtree(FLAGS.data_path)
+    os.makedirs(FLAGS.data_path)
     # Connect an instance to the simulator to make sure that we can turn the
     # synchronous mode off after the script finishes running.
     client, world = get_world(FLAGS.simulator_host, FLAGS.simulator_port,
