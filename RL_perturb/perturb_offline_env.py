@@ -16,6 +16,3 @@ class OfflinePerturbDetectionENV(gym.Env):
 
     def render(self):
         pass
-
-    def _get_init_obstacle_state(self, profile_data_folder, timestamp):
-        return get_init_obstacle(profile_data_folder, timestamp)

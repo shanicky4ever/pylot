@@ -61,7 +61,11 @@ class PoseLoggerOperator(erdos.Operator):
             "pitch": str(msg.data.transform.rotation.pitch),
             "yaw": str(msg.data.transform.rotation.yaw),
             "roll": str(msg.data.transform.rotation.roll),
-            "timestamp": str(timestamp)
+            "timestamp": str(timestamp),
+            'forward_speed': str(msg.data.forward_speed),
+            'velocity_x': str(msg.data.velocity_vector.x),
+            'velocity_y': str(msg.data.velocity_vector.y),
+            'velocity_z': str(msg.data.velocity_vector.z),
         }
         with open(file_name, 'w') as outfile:
             json.dump(measurements, outfile)

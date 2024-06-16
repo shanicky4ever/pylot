@@ -15,6 +15,7 @@ from pylot.simulation.utils import get_world, set_asynchronous_mode
 from datetime import datetime
 import os
 import shutil
+import json
 
 #flags.DEFINE_list('goal_location', '234, 59, 39', 'Ego-vehicle goal location')
 flags.DEFINE_bool('log_rgb_camera', False,
@@ -57,6 +58,8 @@ flags.DEFINE_bool('log_obstacle_with_location', False,
                   'True to enable obstacle with location logging')
 flags.DEFINE_bool('log_obstacle_history', False,
                   'True to enable obstacle history logging')
+flags.DEFINE_bool('log_meta_data', True,
+                    'True to enable meta data logging')
 
 FLAGS = flags.FLAGS
 
@@ -96,6 +99,16 @@ def driver():
         release_sensor_stream,
         pipeline_finish_notify_stream,
     )
+
+
+    if FLAGS.log_meta_data:
+        with open(os.path.join(FLAGS.data_path, 'meta_data.json'), 'w') as f:
+            json.dump({
+                'goal_location': {
+                    'x': FLAGS.goal_location[0],
+                    'y': FLAGS.goal_location[1],
+                    'z': FLAGS.goal_location[2]
+                }}, f, indent=4)
 
     # Add sensors.
     center_camera_setup = RGBCameraSetup('center_camera',

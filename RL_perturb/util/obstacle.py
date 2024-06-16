@@ -7,6 +7,7 @@ from pylot.utils import Vector2D, Transform, Rotation, Location
 import numpy as np
 import re
 from copy import deepcopy
+from pylot.perception.tracking.obstacle_trajectory import ObstacleTrajectory
 
 
 def get_init_obstacle(base_dir, timestamp):
@@ -36,7 +37,7 @@ def replace_latest_trajectories(trajectories, obstacles: List, depth_frame, ego_
         new_location.x += obs_in_traj_info[ob.id]['x']
         new_location.y += obs_in_traj_info[ob.id]['y']
         new_location.z += obs_in_traj_info[ob.id]['z']
-        new_trajectories[obs_in_traj_info[ob.id]['traj']][-1].location =\
+        new_trajectories[obs_in_traj_info[ob.id]['traj']].trajectory[-1].location =\
             Location(new_location.x, new_location.y, new_location.z)
     return new_trajectories
 
@@ -63,7 +64,7 @@ def _find_closest_trans(trajectories: Dict, location):
     closest_id = -1
     dist_x, dist_y = 0, 0
     for traj_id, traj_value in trajectories.items():
-        last_traj = traj_value[-1].location
+        last_traj = traj_value.trajectory[-1].location
         dist = ((location.x - last_traj.x)**2 + (location.y - last_traj.y)**2) ** 0.5
         if dist < min_dist:
             min_dist = dist
@@ -102,9 +103,18 @@ def abstact_tracking_info(track_data):
     info = {}
     for ob_track_data in track_data:
         ob_id = int(re.search(r'id:\s*(\d+)', ob_track_data).group(1))
-        trajectory_pattern = re.findall(
+        label = re.search(r'label:\s*(\w+)', ob_track_data).group(1)
+        confidence = float(re.search(r'confidence:\s*(\d+)', ob_track_data).group(1))
+        bbox_data = re.search(r'BoundingBox2D\(xmin:\s*(\d+),\s*xmax:\s*(\d+),\s*ymin:\s*(\d+),\s*ymax:\s*(\d+)\)', ob_track_data).groups()
+        bbox = BoundingBox2D(int(bbox_data[0]), int(bbox_data[1]), int(bbox_data[2]), int(bbox_data[3]))
+        location_data = re.search(r'location:\s*Location\(x=([-\d.]+),\s*y=([-\d.]+),\s*z=([-\d.]+)\)', ob_track_data).groups()
+        location = Location(float(location_data[0]), float(location_data[1]), float(location_data[2]))
+        rotation_data = re.search(r'rotation:\s*Rotation\(pitch=([-\d.]+),\s*yaw=([-\d.]+),\s*roll=([-\d.]+)\)', ob_track_data).groups()
+        rotation = Rotation(float(rotation_data[0]), float(rotation_data[1]), float(rotation_data[2]))
+        trajectory_data = re.findall(
             r'Transform\(location:\s*Location\(x=([-\d.]+),\s*y=([-\d.]+),\s*z=([-\d.]+)\),\s*rotation:\s*Rotation\(pitch=([-\d.]+),\s*yaw=([-\d.]+),\s*roll=([-\d.]+)\)\)', ob_track_data)
         trajectory = [Transform(Location(float(x), float(y), float(z)), Rotation(
-            float(p), float(yaw), float(r))) for x, y, z, p, yaw, r in trajectory_pattern]
-        info[ob_id] = trajectory
+            float(p), float(yaw), float(r))) for x, y, z, p, yaw, r in trajectory_data]
+        obstacle = Obstacle(ob_id, label, confidence, bbox, location, rotation)
+        info[ob_id] = ObstacleTrajectory(obstacle, trajectory)
     return info
