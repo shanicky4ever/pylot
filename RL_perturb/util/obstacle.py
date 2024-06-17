@@ -1,6 +1,6 @@
 from collections import namedtuple
 from typing import Deque, Dict, List
-from pylot.perception.detection.utils import BoundingBox2D, get_obstacle_locations
+from pylot.perception.detection.utils import BoundingBox2D
 from pylot.perception.detection.obstacle import Obstacle
 from .fileutils import load_json
 from pylot.utils import Vector2D, Transform, Rotation, Location
@@ -105,7 +105,7 @@ def abstact_tracking_info(track_data):
         ob_id = int(re.search(r'id:\s*(\d+)', ob_track_data).group(1))
         label = re.search(r'label:\s*(\w+)', ob_track_data).group(1)
         confidence = float(re.search(r'confidence:\s*(\d+)', ob_track_data).group(1))
-        bbox_data = re.search(r'BoundingBox2D\(xmin:\s*(\d+),\s*xmax:\s*(\d+),\s*ymin:\s*(\d+),\s*ymax:\s*(\d+)\)', ob_track_data).groups()
+        bbox_data = re.search(r'BoundingBox2D\(xmin:\s*(-?\d+),\s*xmax:\s*(\d+),\s*ymin:\s*(-?\d+),\s*ymax:\s*(\d+)\)', ob_track_data).groups()
         bbox = BoundingBox2D(int(bbox_data[0]), int(bbox_data[1]), int(bbox_data[2]), int(bbox_data[3]))
         location_data = re.search(r'location:\s*Location\(x=([-\d.]+),\s*y=([-\d.]+),\s*z=([-\d.]+)\)', ob_track_data).groups()
         location = Location(float(location_data[0]), float(location_data[1]), float(location_data[2]))
