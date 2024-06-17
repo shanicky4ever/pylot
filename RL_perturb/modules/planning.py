@@ -6,9 +6,8 @@ from pylot.planning.rrt_star.rrt_star_planner import RRTStarPlanner
 from pylot.planning.world import World
 import erdos
 
-timestamp = 13499
 
-def planning_generate(ego_transform, pose, prediction, map, goal_location, configs):
+def planning_generate(ego_transform, pose, prediction, map, goal_location, configs, timestamp):
     plan_logger = erdos.utils.setup_logging('planning', 'RLlog.log')
     world = World(flags=configs, logger=plan_logger)
     world.update(timestamp=timestamp,
@@ -17,7 +16,7 @@ def planning_generate(ego_transform, pose, prediction, map, goal_location, confi
                  static_obstacles=[],
                  hd_map=map)
     planner = RRTStarPlanner(world, configs, plan_logger)
-    route_after_behaviour_plan = behaviour_generate(ego_transform, pose, map, goal_location)
+    route_after_behaviour_plan = behaviour_generate(ego_transform, pose, map, goal_location, timestamp)
     world.update_waypoints(route_after_behaviour_plan.waypoints[-1].location, route_after_behaviour_plan)
     (speed_factor, _, _, speed_factor_tl, speed_factor_stop) = world.stop_for_agents(timestamp)
     output_wps = planner.run(timestamp, None)
@@ -30,9 +29,9 @@ def planning_generate(ego_transform, pose, prediction, map, goal_location, confi
 Use Follow Way points to all scen, since no record on previous behavior. TO BE UPDATED later.
 '''
 
-def behaviour_generate(ego_transform, pose, map, goal_location):
+def behaviour_generate(ego_transform, pose, map, goal_location, timestamp):
     ego_info = EgoInfo()
-    ego_info.update(pose)
+    ego_info.update(pose, timestamp)
     state = BehaviorPlannerState.FOLLOW_WAYPOINTS
     # TODO here if we have previous behavior record, we can use it to generate the behavior
     waypoints = map.compute_waypoints(ego_transform.location, goal_location)
@@ -50,7 +49,7 @@ class EgoInfo(object):
         self.last_time_stopped = 0
         self.current_time = 0
 
-    def update(self, pose):
+    def update(self, pose, timestamp):
         self.current_time = timestamp
         if pose.forward_speed >= 0.7:
             self.last_time_moving = self.current_time

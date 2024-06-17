@@ -2,6 +2,7 @@ import gym
 import pathlib
 from util.fileutils import load_json
 from util.obstacle import get_init_obstacle
+from Handler import PylotAfterPerecptionHandler
 
 
 class OfflinePerturbDetectionENV(gym.Env):

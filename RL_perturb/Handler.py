@@ -58,6 +58,6 @@ class PylotAfterPerecptionHandler:
         new_trajectories = replace_latest_trajectories(self.trajectories, new_obs,
             depth_frame=self.depth_frame, ego_transform=self.ego_transform, obs_in_traj_info=self.obs_in_traj_info)
         predicted_trajectories = generate_linear_predicted_trajectories(new_trajectories)
-        planning_waypoints = planning_generate(self.ego_transform, self.pose, predicted_trajectories, self.map, self.goal_location, self.configs)
+        planning_waypoints = planning_generate(self.ego_transform, self.pose, predicted_trajectories, self.map, self.goal_location, self.configs, self.timestamp)
         print(planning_waypoints.waypoints[3])
         
