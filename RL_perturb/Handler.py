@@ -1,7 +1,7 @@
 from json import load
 import pathlib
 from util.fileutils import load_pickle, load_json
-from util.obstacle import abstact_tracking_info, get_init_obstacle, build_obstacle_from_bbox_info, find_obs_in_trajectory, replace_latest_trajectories
+from util.obstacle import abstact_tracking_info, get_init_obstacle, build_obstacle_from_bbox_info, find_obs_in_trajectory, replace_latest_trajectories, get_obstacle_location
 from util.load_config import load_config
 from pylot.utils import Transform, Location, Rotation
 from pylot.perception.depth_frame import DepthFrame
@@ -43,8 +43,8 @@ class PylotAfterPerecptionHandler:
             'trajectories').joinpath(f"trajectories-{self.timestamp}.json"))
         self.trajectories = abstact_tracking_info(self.trajectories_data)
 
-        init_obs = get_init_obstacle(self.profile_data_folder, self.timestamp)
-        self.obs_in_traj_info = find_obs_in_trajectory(self.trajectories, init_obs,
+        self.init_obs = get_init_obstacle(self.profile_data_folder, self.timestamp)
+        self.obs_in_traj_info = find_obs_in_trajectory(self.trajectories, self.init_obs,
             depth_frame=self.depth_frame, ego_transform=self.ego_transform)
         
         with open(self.profile_data_folder.joinpath('map.xodr')) as f:
@@ -59,5 +59,8 @@ class PylotAfterPerecptionHandler:
             depth_frame=self.depth_frame, ego_transform=self.ego_transform, obs_in_traj_info=self.obs_in_traj_info)
         predicted_trajectories = generate_linear_predicted_trajectories(new_trajectories)
         planning_waypoints = planning_generate(self.ego_transform, self.pose, predicted_trajectories, self.map, self.goal_location, self.configs, self.timestamp)
-        print(planning_waypoints.waypoints[3])
         
+    def get_bbox_state(self):
+        obs_locations = [get_obstacle_location(ob, self.depth_frame, self.ego_transform.location) for ob in self.init_obs]
+        dists = [ob.transform.location.distance(self.ego_transform.location) for ob in obs_locations]
+        return obs_locations

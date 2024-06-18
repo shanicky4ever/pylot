@@ -13,17 +13,17 @@ timesatamp = 13499
 
 folder = pathlib.Path(folder)
 
-# env = OfflinePerturbDetectionENV()
+env = OfflinePerturbDetectionENV()
 #print(obs)
-handler = PylotAfterPerecptionHandler(folder, timesatamp)
+#handler = PylotAfterPerecptionHandler(folder, timesatamp)
 # handler.step(handler.ini)
 
 # next_bbox = load_json(folder.joinpath('bboxes').joinpath(f"bboxes-{timesatamp+500}.json"))
 # for nb in next_bbox:
 #     nb['id'] -= 49
 
-next_bbox = load_json(folder.joinpath('bboxes').joinpath(f"bboxes-{timesatamp}.json"))
-for nb in next_bbox:
-    nb['id'] -= 0
+# next_bbox = load_json(folder.joinpath('bboxes').joinpath(f"bboxes-{timesatamp}.json"))
+# for nb in next_bbox:
+#     nb['id'] -= 0
 
-handler.step(next_bbox)
+# handler.step(next_bbox)
