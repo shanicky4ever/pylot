@@ -5,7 +5,7 @@ from perturb_offline_env import OfflinePerturbDetectionENV
 from Handler import PylotAfterPerecptionHandler
 import pathlib
 from util.fileutils import load_pickle, load_json
-from util.obstacle import build_obstacle_from_bbox_info
+from modules.obstacle import build_obstacle_from_bbox_info
 
 
 folder = '/home/erdos/workspace/pylot/data_RL/scc4/RL_profile1'
@@ -14,7 +14,6 @@ timesatamp = 13499
 folder = pathlib.Path(folder)
 
 env = OfflinePerturbDetectionENV()
-#print(obs)
 #handler = PylotAfterPerecptionHandler(folder, timesatamp)
 # handler.step(handler.ini)
 

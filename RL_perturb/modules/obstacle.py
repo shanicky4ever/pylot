@@ -2,7 +2,7 @@ from collections import namedtuple
 from typing import Deque, Dict, List
 from pylot.perception.detection.utils import BoundingBox2D
 from pylot.perception.detection.obstacle import Obstacle
-from .fileutils import load_json
+from util.fileutils import load_json
 from pylot.utils import Vector2D, Transform, Rotation, Location
 import numpy as np
 import re

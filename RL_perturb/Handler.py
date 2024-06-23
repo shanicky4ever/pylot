@@ -1,7 +1,7 @@
 from json import load
 import pathlib
 from util.fileutils import load_pickle, load_json
-from util.obstacle import abstact_tracking_info, get_init_obstacle, build_obstacle_from_bbox_info, find_obs_in_trajectory, replace_latest_trajectories, get_obstacle_location
+from modules.obstacle import abstact_tracking_info, get_init_obstacle, build_obstacle_from_bbox_info, find_obs_in_trajectory, replace_latest_trajectories, get_obstacle_location
 from util.load_config import load_config
 from pylot.utils import Transform, Location, Rotation
 from pylot.perception.depth_frame import DepthFrame
@@ -63,4 +63,4 @@ class PylotAfterPerecptionHandler:
     def get_bbox_state(self):
         obs_locations = [get_obstacle_location(ob, self.depth_frame, self.ego_transform.location) for ob in self.init_obs]
         dists = [ob.transform.location.distance(self.ego_transform.location) for ob in obs_locations]
-        return obs_locations
+        return obs_locations, dists
