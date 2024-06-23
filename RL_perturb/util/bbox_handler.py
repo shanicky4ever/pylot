@@ -11,6 +11,17 @@ class BboxHandler:
         self.max_zoom_ratio = max_zoom_ratio
         print(self.bbox)
 
+    def step(self, action):
+        dx, dy, dw, dh = action
+        self.bbox[0][0] += dx
+        self.bbox[0][1] += dy
+        self.bbox[1] += dh
+        self.bbox[2] += dw
+        self.bbox[0][0] = max(0, min(self.frame_width, self.bbox[0][0]))
+        self.bbox[0][1] = max(0, min(self.frame_height, self.bbox[0][1]))
+        self.bbox[1] = max(0, min(self.frame_height, self.bbox[1]))
+        self.bbox[2] = max(0, min(self.frame_width, self.bbox[2]))
+        return self.center2corner(self.bbox)
 
     def corner2center(self, corner_bbox):
         x_min, y_min, x_max, y_max = corner_bbox[0], corner_bbox[1], corner_bbox[2], corner_bbox[3]
