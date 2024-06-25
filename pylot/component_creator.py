@@ -93,7 +93,7 @@ def add_obstacle_detection(center_camera_stream,
         else:
             obstacles_stream = obstacles_stream_wo_depth
 
-    if FLAGS.perfect_obstacle_detection or FLAGS.evaluate_obstacle_detection:
+    if FLAGS.perfect_obstacle_detection or FLAGS.evaluate_obstacle_detection or FLAGS.custom_obstacle_detection_eval:
         assert (pose_stream is not None and depth_camera_stream is not None
                 and segmented_camera_stream is not None
                 and ground_obstacles_stream is not None

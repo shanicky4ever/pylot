@@ -1035,3 +1035,14 @@ def add_obstacle_with_location_logging(obstacle_with_location_stream, file_base_
                                                 FLAGS, file_base_name)
     return finished_indicator_stream
 
+def add_custom_obstacle_detection_eval(obstacles_stream, perfect_obstacles_stream, name='custom_obstacle_detection_eval'):
+    from pylot.perception.detection.custom_detection_eval_operator import CustomDetectionEvalOperator
+    op_config = erdos.OperatorConfig(name=name,
+                                     log_file_name=FLAGS.log_file_name,
+                                     csv_log_file_name=FLAGS.csv_log_file_name,
+                                     profile_file_name=FLAGS.profile_file_name)
+    [finished_indicator_stream] = erdos.connect(
+        CustomDetectionEvalOperator, op_config,
+        [obstacles_stream, perfect_obstacles_stream],FLAGS
+    )
+    return finished_indicator_stream

@@ -16,7 +16,7 @@ rm pylot.log
 
 export SCENARIO_RUNNER_ROOT="/home/erdos/workspace/scenario_runner"
 
-sleep 5| pv -t
+# sleep 5| pv -t
 
 carla_device=0
 pylot_device=0
@@ -46,7 +46,9 @@ while getopts "c:p:f:o:s:" opt; do
     esac
 done
 
-sed -i "s#--data_path=.*#--data_path=data_scen/${scenario}#" $PYLOT_HOME/${flagfile}
+data_path="data_scen/${scenario}"
+
+sed -i "s#--data_path=.*#--data_path=${data_path}#" $PYLOT_HOME/${flagfile}
 
 export CUDA_VISIBLE_DEVICES=$carla_device
 nohup zsh -c $PYLOT_HOME/scripts/run_simulator.sh > /tmp/carla.log 2>&1 &
@@ -56,7 +58,7 @@ sleep 5s |pv -t
 nohup python ${SCENARIO_RUNNER_ROOT}/scenario_runner.py --scenario ${scenario} --reloadWorld > /tmp/scenario_runner.log 2>&1 &
 
 echo "Scenario runner loiading..."
-sleep 2| pv -t
+sleep 2s| pv -t
 
 timeout 180s python $PYLOT_HOME/pylot_with_log.py --flagfile $PYLOT_HOME/${flagfile}
 
@@ -82,6 +84,9 @@ timeout 180s python $PYLOT_HOME/pylot_with_log.py --flagfile $PYLOT_HOME/${flagf
 
 kill -9 $(ps -ef|grep carla|gawk '$0 !~/grep/ {print $2}' |tr -s '\n' ' ')
 kill -9 $(ps -ef|grep pylot_with|gawk '$0 !~/grep/ {print $2}' |tr -s '\n' ' ')
+
+mv pylot.log ${data_path}/
+mv pylot.csv ${data_path}/
 
 echo "fininshing..."
 sleep 3 | pv -t
