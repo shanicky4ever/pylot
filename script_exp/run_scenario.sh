@@ -55,11 +55,13 @@ nohup zsh -c $PYLOT_HOME/scripts/run_simulator.sh > /tmp/carla.log 2>&1 &
 echo "Carla simulator loading..."
 sleep 5s |pv -t
 
+
 nohup python ${SCENARIO_RUNNER_ROOT}/scenario_runner.py --scenario ${scenario} --reloadWorld > /tmp/scenario_runner.log 2>&1 &
 
 echo "Scenario runner loiading..."
 sleep 2s| pv -t
 
+export CUDA_VISIBLE_DEVICES=$pylot_device
 timeout 180s python $PYLOT_HOME/pylot_with_log.py --flagfile $PYLOT_HOME/${flagfile}
 
 
@@ -87,6 +89,8 @@ kill -9 $(ps -ef|grep pylot_with|gawk '$0 !~/grep/ {print $2}' |tr -s '\n' ' ')
 
 mv pylot.log ${data_path}/
 mv pylot.csv ${data_path}/
+
+unset CUDA_VISIBLE_DEVICES
 
 echo "fininshing..."
 sleep 3 | pv -t

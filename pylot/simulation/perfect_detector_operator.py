@@ -7,6 +7,8 @@ from pylot.perception.messages import ObstaclesMessage
 from pylot.simulation.utils import get_detected_speed_limits, \
     get_detected_traffic_stops
 
+import os
+
 
 class PerfectDetectorOperator(erdos.Operator):
     """Uses info from the simulator to perfectly detect obstacles, stop and
@@ -90,6 +92,8 @@ class PerfectDetectorOperator(erdos.Operator):
         self._speed_limit_signs = deque()
         self._stop_signs = deque()
         self._frame_cnt = 0
+        self._data_path = os.path.join(self._flags.data_path,'perfect-detect')
+        os.makedirs(self._data_path)
 
     @staticmethod
     def connect(depth_camera_stream: ReadStream,
@@ -160,7 +164,7 @@ class PerfectDetectorOperator(erdos.Operator):
                                                        det_obstacles,
                                                        vehicle_transform)
             bgr_msg.frame.save(bgr_msg.timestamp.coordinates[0],
-                               self._flags.data_path, 'perfect-detector')
+                               self._data_path, 'perfect-detector')
 
     def on_pose_update(self, msg: Message):
         self._logger.debug('@{}: received pose message'.format(msg.timestamp))
