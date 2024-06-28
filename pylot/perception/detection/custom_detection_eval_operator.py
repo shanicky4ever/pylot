@@ -76,10 +76,9 @@ class CustomDetectionEvalOperator(erdos.Operator):
                         "categories":[]}
         for obs in obstacles:
             if obs.is_person() or obs.is_vehicle():
-                label = 'vehicle' if obs.is_vehicle() else 'person'
-                if label not in self.labels:
-                    self.labels[label] = len(self.labels) + 1
-                    truth_data["categories"].append({"id":self.labels[label], "name":label, "supercategory": label})
+                if obs.label not in self.labels:
+                    self.labels[obs.label] = len(self.labels) + 1
+                    truth_data["categories"].append({"id":self.labels[obs.label], "name":obs.label, "supercategory": obs.label})
                 x, y, h, w = self._corner2center(obs.bounding_box_2D)
                 truth_data["annotations"].append({
                     "id": len(truth_data['annotations'])+1,
