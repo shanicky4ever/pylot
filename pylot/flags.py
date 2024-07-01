@@ -221,7 +221,8 @@ def must_add_segmented_camera_sensor():
     """
     return (FLAGS.evaluate_segmentation or FLAGS.perfect_segmentation
             or FLAGS.perfect_obstacle_detection
-            or FLAGS.evaluate_obstacle_detection)
+            or FLAGS.evaluate_obstacle_detection
+            or FLAGS.custom_obstacle_detection_eval)
 
 
 def must_add_lidar_sensor():

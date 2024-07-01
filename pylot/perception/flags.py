@@ -112,9 +112,9 @@ flags.DEFINE_enum('segmentation_metric', 'mIoU', ['mIoU', 'timely-mIoU'],
                   'Segmentation evaluation metric')
 
 # Detection eval flags.
-flags.DEFINE_integer('detection_eval_lookback', None,
+flags.DEFINE_integer('detection_eval_lookback', 1,
                      'Number of images from the past to aggregate')
-flags.DEFINE_integer('detection_eval_freq', None,
+flags.DEFINE_integer('detection_eval_freq', 1,
                      'Give rolling detection eval every this many images')
 
 # Tracking eval flags.
@@ -127,3 +127,5 @@ flags.DEFINE_float('obstacle_error', 0.0,
                    'the value of the obstacle error')
 flags.DEFINE_enum('obstacle_mutate', 'yup',
                   ['yup', 'xleft', 'zoomout','random'], 'the mutate of the obstacle')
+flags.DEFINE_bool('custom_obstacle_detection_eval',False,
+    'True to enable custom obstacle detection evaluation')

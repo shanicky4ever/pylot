@@ -207,6 +207,9 @@ def driver():
     if FLAGS.log_multiple_object_tracker:
         pylot.operator_creator.add_multiple_object_tracker_logging(
             obstacles_stream)
+        
+    if FLAGS.custom_obstacle_detection_eval:
+        pylot.operator_creator.add_custom_obstacle_detection_eval(obstacles_stream, perfect_obstacles_stream)
 
     tl_transform = pylot.utils.Transform(CENTER_CAMERA_LOCATION,
                                          pylot.utils.Rotation())
