@@ -235,6 +235,39 @@ def driver():
             obstacles_stream, depth_stream, pose_stream, center_camera_setup)
         pylot.operator_creator.add_obstacle_with_location_logging(
             obs_with_loc_stream, 'obstacles_with_location')
+
+
+    if FLAGS.log_chauffeur or FLAGS.log_top_down_segmentation:
+        top_down_transform = pylot.utils.get_top_down_transform(
+            transform, FLAGS.top_down_camera_altitude)
+        top_down_seg_cs = SegmentedCameraSetup('top_down_segmented_camera',
+                                               FLAGS.camera_image_width,
+                                               FLAGS.camera_image_height,
+                                               top_down_transform, 90)
+        (top_down_segmented_stream, _) = \
+            pylot.operator_creator.add_camera_driver(
+                top_down_seg_cs,
+                vehicle_id_stream,
+                release_sensor_stream)
+
+        if FLAGS.log_top_down_segmentation:
+            pylot.operator_creator.add_camera_logging(
+                top_down_segmented_stream,
+                'top_down_segmented_logger_operator', 'top-down-segmented')
+
+        if FLAGS.log_chauffeur:
+            top_down_camera_setup = RGBCameraSetup('top_down_rgb_camera',
+                                                   FLAGS.camera_image_width,
+                                                   FLAGS.camera_image_height,
+                                                   top_down_transform, 90)
+            (top_down_camera_stream,
+             _) = pylot.operator_creator.add_camera_driver(
+                 top_down_camera_setup, vehicle_id_stream,
+                 release_sensor_stream)
+            pylot.operator_creator.add_chauffeur_logging(
+                vehicle_id_stream, pose_stream, obstacles_tracking_stream,
+                top_down_camera_stream, top_down_segmented_stream,
+                top_down_camera_setup)
     
     if FLAGS.log_trajectories:
         pylot.operator_creator.add_trajectory_logging(
