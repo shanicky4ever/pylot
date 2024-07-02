@@ -164,7 +164,9 @@ def driver():
 
     if FLAGS.log_segmented_camera:
         pylot.operator_creator.add_camera_logging(
-            segmented_stream, 'center_segmented_camera_logger_operator',
+            #segmented_stream, 
+            ground_segmented_stream,
+            'center_segmented_camera_logger_operator',
             'segmented')
 
     if FLAGS.log_depth_camera:

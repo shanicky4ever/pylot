@@ -92,8 +92,9 @@ class PerfectDetectorOperator(erdos.Operator):
         self._speed_limit_signs = deque()
         self._stop_signs = deque()
         self._frame_cnt = 0
-        self._data_path = os.path.join(self._flags.data_path,'perfect-detect')
-        os.makedirs(self._data_path)
+        if self._flags.log_detector_output:
+            self._data_path = os.path.join(self._flags.data_path,'perfect-detect')
+            os.makedirs(self._data_path)
 
     @staticmethod
     def connect(depth_camera_stream: ReadStream,
