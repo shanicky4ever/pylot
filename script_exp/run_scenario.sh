@@ -62,7 +62,7 @@ echo "Scenario runner loiading..."
 sleep 2s| pv -t
 
 
-timeout 150s python $PYLOT_HOME/pylot_with_log.py --flagfile $PYLOT_HOME/${flagfile}
+timeout 200s python $PYLOT_HOME/pylot_with_log.py --flagfile $PYLOT_HOME/${flagfile}
 
 
 # script_scenario="/bin/zsh /home/erdos/workspace/run_sc.sh "$scenario

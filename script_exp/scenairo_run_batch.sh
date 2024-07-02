@@ -1,5 +1,6 @@
 carla_device=0
 pylot_device=0
+inputfile="script_exp/scenario.list"
 
 while getopts "c:p:f:i:" opt; do
     case $opt in
