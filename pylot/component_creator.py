@@ -415,6 +415,46 @@ def add_obstacle_tracking(center_camera_stream,
 
     return obstacles_tracking_stream
 
+def add_obstacle_tracking_w_GThistory_perception(center_camera_stream,
+                          center_camera_setup,
+                          obstacles_stream,
+                          depth_stream=None,
+                          vehicle_id_stream=None,
+                          pose_stream=None,
+                          ground_obstacles_stream=None,
+                          time_to_decision_stream=None):
+    if FLAGS.tracker_type == 'center_track':
+        logger.debug('Using CenterTrack obstacle tracker...')
+        obstacles_wo_history_tracking_stream = \
+            pylot.operator_creator.add_center_track_tracking(
+                center_camera_stream, center_camera_setup)
+    elif FLAGS.tracker_type == 'qd_track':
+        logger.debug('Using QDTrack obstacle tracker...')
+        obstacles_wo_history_tracking_stream = \
+            pylot.operator_creator.add_qd_track_tracking(
+                center_camera_stream, center_camera_setup)
+    else:
+        logger.debug('Using obstacle tracker...')
+        obstacles_wo_history_tracking_stream = \
+            pylot.operator_creator.add_obstacle_tracking(
+                obstacles_stream,
+                center_camera_stream,
+                time_to_decision_stream)
+    logger.debug('Adding operator to compute obstacle location history and perception info...')
+    perfect_tracking_stream = \
+        pylot.operator_creator.add_perfect_tracking(
+                vehicle_id_stream, ground_obstacles_stream, pose_stream)
+    obstacles_tracking_stream = \
+        pylot.operator_creator.add_obstacle_tracking_w_gt(
+            obstacles_wo_history_tracking_stream,
+            depth_stream,
+            pose_stream,
+            perfect_tracking_stream, 
+            center_camera_setup
+        )
+    return obstacles_tracking_stream
+    
+
 
 def add_segmentation(center_camera_stream, ground_segmented_stream=None):
     """Adds operators for pixel semantic segmentation.

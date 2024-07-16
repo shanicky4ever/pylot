@@ -28,7 +28,7 @@ class TrajectoryLoggerOperator(erdos.Operator):
                                                  self.config.log_file_name)
         self._flags = flags
         self._msg_cnt = 0
-        self._data_path = os.path.join(self._flags.data_path, 'trajectories')
+        self._data_path = os.path.join(self._flags.data_path, self.config.name)
         os.makedirs(self._data_path, exist_ok=True)
 
     @staticmethod

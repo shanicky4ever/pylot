@@ -157,6 +157,10 @@ class PerfectDetectorOperator(erdos.Operator):
 
         det_obstacles = det_obstacles + det_speed_limits + det_stop_signs
 
+        for i, ob in enumerate(det_obstacles):
+            det_obstacles[i].transform.location.x -= self._flags.camera_loc_x
+            det_obstacles[i].transform.location.y -= self._flags.camera_loc_y
+
         # Send the detected obstacles.
         obstacles_stream.send(ObstaclesMessage(timestamp, det_obstacles))
 

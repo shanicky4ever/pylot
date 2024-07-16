@@ -97,6 +97,12 @@ flags.DEFINE_float('gnss_bias_lat', 0.0,
 flags.DEFINE_float('gnss_bias_lon', 0.0,
                    'Sets the bias on the longitude of the GNSS sensor.')
 
+flags.DEFINE_float('camera_loc_x', 1.3, 
+                   'Sets the location of the camera relative to the ego-vehicle.')
+flags.DEFINE_float('camera_loc_y', 0.0, 
+                   'Sets the location of the camera relative to the ego-vehicle.')
+flags.DEFINE_float('camera_loc_z', 1.8, 
+                   'Sets the location of the camera relative to the ego-vehicle.')
 
 def sensor_frequency_validator(flags_dict):
     return flags_dict['simulator_camera_frequency'] <= \

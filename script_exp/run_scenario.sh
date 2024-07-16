@@ -58,11 +58,11 @@ sleep 5s |pv -t
 export CUDA_VISIBLE_DEVICES=$pylot_device
 nohup python ${SCENARIO_RUNNER_ROOT}/scenario_runner.py --scenario ${scenario} --reloadWorld > /tmp/scenario_runner.log 2>&1 &
 
-echo "Scenario runner loiading..."
+echo "Scenario runner loading..."
 sleep 2s| pv -t
 
 
-timeout 200s python $PYLOT_HOME/pylot_with_log.py --flagfile $PYLOT_HOME/${flagfile}
+timeout 200s python $PYLOT_HOME/pylot_with_virtual_eval.py --flagfile $PYLOT_HOME/${flagfile}
 
 
 # script_scenario="/bin/zsh /home/erdos/workspace/run_sc.sh "$scenario

@@ -146,6 +146,22 @@ def add_obstacle_location_history(obstacles_stream, depth_stream, pose_stream,
                        camera_setup)
     return tracked_obstacles
 
+def add_obstacle_tracking_w_gt(obstacles_stream, 
+                               depth_stream, 
+                               pose_stream,
+                               ground_obstacles_stream,
+                                camera_setup,
+                          name_prefix='tracker_wGT_'):
+    from pylot.perception.tracking.obstacle_location_history_w_gthistory import ObstacleLocationWGThistoryOperator
+    op_config = erdos.OperatorConfig(name=name_prefix + FLAGS.tracker_type,
+                                     log_file_name=FLAGS.log_file_name,
+                                     csv_log_file_name=FLAGS.csv_log_file_name,
+                                     profile_file_name=FLAGS.profile_file_name)
+    [obstacle_tracking_stream] = erdos.connect(
+        ObstacleLocationWGThistoryOperator, op_config,
+        [obstacles_stream, depth_stream, pose_stream, ground_obstacles_stream], FLAGS, camera_setup)
+    return obstacle_tracking_stream
+
 
 def add_detection_decay(ground_obstacles_stream):
     from pylot.perception.detection.detection_decay_operator import \
@@ -262,7 +278,6 @@ def add_obstacle_tracking(obstacles_stream,
         [obstacles_stream, bgr_camera_stream, time_to_decision_stream],
         FLAGS.tracker_type, FLAGS)
     return obstacle_tracking_stream
-
 
 def add_center_track_tracking(bgr_camera_stream,
                               camera_setup,
@@ -817,7 +832,7 @@ def add_multiple_object_tracker_logging(
 
 
 def add_trajectory_logging(obstacles_tracking_stream,
-                           name='trajectory_logger_operator'):
+                           name='trajectory'):
     from pylot.loggers.trajectory_logger_operator import \
         TrajectoryLoggerOperator
     op_config = erdos.OperatorConfig(name=name,

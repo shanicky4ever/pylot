@@ -4,7 +4,7 @@ from pycocotools.coco import COCO
 from collections import deque
 import json
 import os
-
+import shutil
 class CustomDetectionEvalOperator(erdos.Operator):
     def __init__(self, obstacles_stream: erdos.ReadStream, 
                  perfect_obstacles_stream: erdos.ReadStream,
@@ -21,6 +21,8 @@ class CustomDetectionEvalOperator(erdos.Operator):
         self._frame_cnt = 0
         # self.labels = {}
         self._data_path = os.path.join(self._flags.data_path, 'detect_eval')
+        if os.path.exists(self._data_path):
+            shutil.rmtree(self._data_path)
         os.makedirs(self._data_path, exist_ok=True)
         self.keys=['AP','AP50','AP75','AP_small','AP_medium','AP_large','AR1','AR10','AR100','AR_small','AR_medium','AR_large']
 
@@ -58,7 +60,7 @@ class CustomDetectionEvalOperator(erdos.Operator):
             coco_eval = COCOeval(coco_gt, coco_dt, "bbox")
             coco_eval.evaluate()
             coco_eval.accumulate()
-            coco_eval.summarize()
+            # coco_eval.summarize()
             res = {k: v for k, v in zip(self.keys, coco_eval.stats)}
             res['iou'] = coco_eval.ious[(1,1)].tolist()
         else:

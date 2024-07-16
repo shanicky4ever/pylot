@@ -5,6 +5,8 @@ from erdos import Message, ReadStream, Timestamp, WriteStream
 
 from pylot.perception.messages import ObstacleTrajectoriesMessage
 from pylot.perception.tracking.obstacle_trajectory import ObstacleTrajectory
+import pylot
+import pylot.utils
 
 
 class PerfectTrackerOperator(erdos.Operator):
@@ -64,6 +66,9 @@ class PerfectTrackerOperator(erdos.Operator):
                 # If we are not performing ego-agent prediction, do not
                 # track the ego-vehicle.
                 continue
+            
+            # obstacle.transform.location.x -= self._flags.camera_loc_x
+            # obstacle.transform.location.y -= self._flags.camera_loc_y
 
             if (pose_transform.location.distance(obstacle.transform.location) >
                     self._flags.dynamic_obstacle_distance_threshold):
@@ -76,10 +81,17 @@ class PerfectTrackerOperator(erdos.Operator):
             for past_obstacle_loc in self._obstacles[obstacle.id]:
                 # Get the transform of the center of the obstacle's bounding
                 # box, in relation to the Pose measurement.
-                v_transform = past_obstacle_loc.transform * \
-                                past_obstacle_loc.bounding_box.transform
-                new_transform = (pose_transform.inverse_transform() *
-                                 v_transform)
+                # v_transform = past_obstacle_loc.transform * \
+                #                 past_obstacle_loc.bounding_box.transform
+                # new_transform = (pose_transform.inverse_transform() *
+                #                  v_transform)
+                new_location = \
+                    pose_transform.inverse_transform_locations(
+                        [past_obstacle_loc.transform.location])[0]
+                new_transform = pylot.utils.Transform(
+                    new_location,
+                    pylot.utils.Rotation()
+                )
                 cur_obstacle_trajectory.append(new_transform)
             obstacle_trajectories.append(
                 ObstacleTrajectory(obstacle, cur_obstacle_trajectory))

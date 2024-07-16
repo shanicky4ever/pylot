@@ -6,6 +6,7 @@ import time
 from functools import total_ordering
 
 from carla import Location, VehicleControl, command
+from carla import Vehicle, Walker
 
 import erdos
 from erdos import ReadStream, Timestamp, WriteStream
@@ -15,6 +16,9 @@ import pylot.utils
 from pylot.control.messages import ControlMessage
 from pylot.perception.messages import ObstaclesMessage, SpeedSignsMessage, \
     StopSignsMessage, TrafficLightsMessage
+import os
+import json
+import shutil
 
 
 class CarlaOperator(erdos.Operator):
@@ -68,6 +72,11 @@ class CarlaOperator(erdos.Operator):
                                                  self.config.log_file_name)
         self._csv_logger = erdos.utils.setup_csv_logging(
             self.config.name + '-csv', self.config.csv_log_file_name)
+        if self._flags.log_actor_from_simulator:
+            actor_folder = os.path.join(self._flags.data_path, 'actors')
+            if os.path.exists(actor_folder):
+                shutil.rmtree(actor_folder)
+            os.makedirs(actor_folder)
         # Connect to simulator and retrieve the world running.
         self._client, self._world = pylot.simulation.utils.get_world(
             self._flags.simulator_host, self._flags.simulator_port,
@@ -375,6 +384,12 @@ class CarlaOperator(erdos.Operator):
     def __send_ground_actors_data(self, timestamp: Timestamp):
         # Get all the actors in the simulation.
         actor_list = self._world.get_actors()
+        if self._flags.log_actor_from_simulator:
+            self.log_actor_from_simulator(
+                actor_list,
+                timestamp,
+                os.path.join(self._flags.data_path, 'actors')
+            )
 
         (vehicles, people, traffic_lights, speed_limits, traffic_stops
          ) = pylot.simulation.utils.extract_data_in_pylot_format(actor_list)
@@ -424,6 +439,36 @@ class CarlaOperator(erdos.Operator):
         v_pose.location.z = 5
         self._spectator.set_transform(v_pose)
 
+    def log_actor_from_simulator(self, actor_list, timestamp, data_path):
+        file_path = os.path.join(data_path, f"actors-{timestamp.coordinates[0]}.json")
+        data = {}
+        for actor in actor_list:
+            if isinstance(actor, Vehicle) or isinstance(actor, Walker):
+                name = str(actor.id)
+                if self._ego_vehicle.id == actor.id:
+                    name = 'hero'
+                data[name] = {
+                    'extent': {
+                        'x': actor.bounding_box.extent.x,
+                        'y': actor.bounding_box.extent.y,
+                        'z': actor.bounding_box.extent.z
+                    },
+                    'location': {
+                        'x': actor.get_location().x,
+                        'y': actor.get_location().y,
+                        'z': actor.get_location().z
+                    },
+                    'rotation': {
+                        'pitch': actor.get_transform().rotation.pitch,
+                        'roll': actor.get_transform().rotation.roll,
+                        'yaw': actor.get_transform().rotation.yaw
+                    }
+                }
+        if len(data) > 0:
+            with open(file_path, 'w') as f:
+                json.dump(data, f)
+
+
 
 @total_ordering
 class TickEvent(enum.Enum):
@@ -434,3 +479,5 @@ class TickEvent(enum.Enum):
         if self.__class__ is other.__class__:
             return self.value < other.value
         return NotImplemented
+
+

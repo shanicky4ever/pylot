@@ -23,6 +23,9 @@ flags.DEFINE_enum(
     ['simulation', 'real-world', 'challenge-map', 'challenge-sensors'],
     'Sets the mode in which the pipeline executes')
 
+flags.DEFINE_bool('log_actor_from_simulator', False,
+                  'True to log obstacle extents')
+
 ######################################################################
 # Perception
 ######################################################################
@@ -533,3 +536,7 @@ flags.register_multi_flags_validator(
     ['lane_detection', 'perfect_lane_detection'],
     lane_detection_validator,
     message='--lane_detection and --perfect_lane_detection cannot be both set')
+
+flags.DEFINE_bool(
+    'fake_tracking_w_gt', False,
+    'Whether to use perfect obstacle detection.')

@@ -245,17 +245,6 @@ def driver():
             obstacles_stream, depth_stream, pose_stream, center_camera_setup)
         pylot.operator_creator.add_obstacle_with_location_logging(
             obs_with_loc_stream, 'obstacles_with_location')
-        
-    if FLAGS.fake_tracking_w_gt:
-        obstacle_tracking_stream_w_gt = pylot.component_creator.add_obstacle_tracking_w_GThistory_perception(
-            center_camera_stream, center_camera_setup, obstacles_stream,
-        depth_stream, vehicle_id_stream, pose_stream, 
-        ground_obstacles_stream,
-        time_to_decision_loop_stream)
-        if FLAGS.log_trajectories:
-            pylot.operator_creator.add_trajectory_logging(
-                obstacle_tracking_stream_w_gt, 
-                name="trajectory_w_gt")
 
 
     if FLAGS.log_chauffeur or FLAGS.log_top_down_segmentation:
@@ -326,6 +315,27 @@ def driver():
     if FLAGS.log_waypoints:
         pylot.operator_creator.add_waypoints_logging(waypoints_stream,
                                                      'waypoint')
+        
+    if FLAGS.fake_tracking_w_gt:
+        obstacle_tracking_stream_w_gt = pylot.component_creator.add_obstacle_tracking_w_GThistory_perception(
+            center_camera_stream, center_camera_setup, obstacles_stream,
+        depth_stream, vehicle_id_stream, pose_stream, 
+        ground_obstacles_stream,
+        time_to_decision_loop_stream)
+        if FLAGS.log_trajectories:
+            pylot.operator_creator.add_trajectory_logging(
+                obstacle_tracking_stream_w_gt, 
+                name="trajectory_w_gt")
+        prediction_stream_w_gt, prediction_camera_stream_w_gt, notify_prediction_stream_w_gt = pylot.component_creator.add_prediction(
+            obstacle_tracking_stream_w_gt, vehicle_id_stream,
+            time_to_decision_loop_stream, transform, release_sensor_stream,
+            pose_stream, point_cloud_stream, lidar_setup)
+        if prediction_stream_w_gt is None:
+            prediction_stream_w_gt = obstacles_stream
+        if notify_prediction_stream_w_gt:
+            notify_streams.append(notify_prediction_stream_w_gt)
+        if FLAGS.log_predictions:
+            pylot.operator_creator.add_prediction_logging(prediction_stream_w_gt,'prediction_w_gt')                                 
 
     if FLAGS.simulator_mode == "pseudo-asynchronous":
         # Add a synchronizer in the pseudo-asynchronous mode.
