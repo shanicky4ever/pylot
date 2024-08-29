@@ -14,7 +14,7 @@ from pylot.simulation.utils import get_world, set_asynchronous_mode
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_list('goal_location', '234, 59, 39', 'Ego-vehicle goal location')
+# flags.DEFINE_list('goal_location', '234, 59, 39', 'Ego-vehicle goal location')
 
 # The location of the center camera relative to the ego-vehicle.
 CENTER_CAMERA_LOCATION = pylot.utils.Location(1.3, 0.0, 1.8)

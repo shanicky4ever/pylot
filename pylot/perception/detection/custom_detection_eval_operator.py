@@ -5,6 +5,10 @@ from collections import deque
 import json
 import os
 import shutil
+import contextlib
+import io
+
+
 class CustomDetectionEvalOperator(erdos.Operator):
     def __init__(self, obstacles_stream: erdos.ReadStream, 
                  perfect_obstacles_stream: erdos.ReadStream,
@@ -47,26 +51,27 @@ class CustomDetectionEvalOperator(erdos.Operator):
         perf = self.obstacle_perfect.popleft()
         assert percpt[0] == perf[0]
         self._frame_cnt += 1
-        if self._frame_cnt % self._flags.detection_eval_freq != 0:
-            return
-        self.labels = {}
-        truth_data = self._build_truth_data(perf[1])
-        percpt_data = self._build_perception_data(percpt[1])
-        if len(truth_data) and len(percpt_data):
-            coco_gt = COCO()
-            coco_gt.dataset = truth_data
-            coco_gt.createIndex()
-            coco_dt = coco_gt.loadRes(percpt_data)
-            coco_eval = COCOeval(coco_gt, coco_dt, "bbox")
-            coco_eval.evaluate()
-            coco_eval.accumulate()
-            # coco_eval.summarize()
-            res = {k: v for k, v in zip(self.keys, coco_eval.stats)}
-            res['iou'] = coco_eval.ious[(1,1)].tolist()
-        else:
-            res = {}
-        with open(os.path.join(self._data_path,f'detection_eval-{percpt[0]}.json'), 'w') as f:
-            json.dump(res, f)
+        if self._frame_cnt % self._flags.detection_eval_freq == 0:
+            self.labels = {}
+            truth_data = self._build_truth_data(perf[1])
+            percpt_data = self._build_perception_data(percpt[1])
+            
+            if len(truth_data) and len(percpt_data):
+                with contextlib.redirect_stdout(io.StringIO()):
+                    coco_gt = COCO()
+                    coco_gt.dataset = truth_data
+                    coco_gt.createIndex()
+                    coco_dt = coco_gt.loadRes(percpt_data)
+                    coco_eval = COCOeval(coco_gt, coco_dt, "bbox")
+                    coco_eval.evaluate()
+                    coco_eval.accumulate()
+                    #coco_eval.summarize()
+                res = {k: v for k, v in zip(self.keys, coco_eval.stats)}
+                res['iou'] = coco_eval.ious[(1,1)].tolist()
+            else:
+                res = {}
+            with open(os.path.join(self._data_path,f'detection_eval-{percpt[0]}.json'), 'w') as f:
+                json.dump(res, f)
         
 
     def _build_truth_data(self, obstacles):
@@ -77,15 +82,18 @@ class CustomDetectionEvalOperator(erdos.Operator):
                         "annotations":[],
                         "categories":[]}
         for obs in obstacles:
+            if obs.bounding_box_2D is None:
+                continue
             if obs.is_person() or obs.is_vehicle():
-                if obs.label not in self.labels:
-                    self.labels[obs.label] = len(self.labels) + 1
-                    truth_data["categories"].append({"id":self.labels[obs.label], "name":obs.label, "supercategory": obs.label})
+                label = 'vehicle' if obs.is_vehicle() else 'person'
+                if label not in self.labels:
+                    self.labels[label] = len(self.labels) + 1
+                    truth_data["categories"].append({"id":self.labels[label], "name":label, "supercategory": label})
                 x, y, h, w = self._corner2center(obs.bounding_box_2D)
                 truth_data["annotations"].append({
                     "id": len(truth_data['annotations'])+1,
                     "image_id":1,
-                    "category_id":self.labels[obs.label],
+                    "category_id":self.labels[label],
                     "bbox": [x, y, h, w],
                     "area": h*w,
                     "iscrowd":0})
@@ -100,7 +108,7 @@ class CustomDetectionEvalOperator(erdos.Operator):
                 label = 'vehicle' if obs.is_vehicle() else 'person'
                 if label not in self.labels:
                     continue
-                x, y, h, w = self._corner2center(obs.bounding_box)
+                x, y, h, w = self._corner2center(obs.bounding_box_2D)
                 detect_results.append({ #"id": len(detect_results)+1,
                                         "image_id":1,
                                         "category_id":self.labels[label],

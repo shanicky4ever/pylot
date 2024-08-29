@@ -6,6 +6,9 @@ import erdos
 from erdos import Message, ReadStream, Timestamp, WriteStream
 
 from pylot.utils import Vector2D, time_epoch_ms
+import os
+import shutil
+import json
 
 
 class PredictionEvalOperator(erdos.Operator):
@@ -23,6 +26,7 @@ class PredictionEvalOperator(erdos.Operator):
             received from the prediction operator.
         flags (absl.flags): Object to be used to access absl flags.
     """
+
     def __init__(self, pose_stream: ReadStream, tracking_stream: ReadStream,
                  prediction_stream: ReadStream,
                  finished_indicator_stream: WriteStream, flags):
@@ -44,6 +48,11 @@ class PredictionEvalOperator(erdos.Operator):
         # Accumulated list of predictions, from oldest to newest.
         self._predictions = deque(
             maxlen=self._flags.prediction_num_future_steps)
+        self._data_path = os.path.join(self._flags.data_path, self.config.name)
+        if os.path.exists(self._data_path):
+            shutil.rmtree(self._data_path)
+        os.makedirs(self._data_path, exist_ok=True)
+        self.detectID_convert_gtID = {}
 
     @staticmethod
     def connect(pose_stream: ReadStream, tracking_stream: ReadStream,
@@ -123,6 +132,18 @@ class PredictionEvalOperator(erdos.Operator):
         for obstacle_prediction in predictions:
             # We remove altitude from the accuracy calculation because the
             # prediction operators do not currently predict altitude.
+            if obstacle_prediction.id not in self.detectID_convert_gtID:
+                # e xsit_gtID = [v for k, v in self.detectID_convert_gtID.items()]
+                min_dist = 2 * self._flags.dynamic_obstacle_distance_threshold
+                for gt_id, traj in ground_trajectories.items():
+                    if gt_id in self.detectID_convert_gtID.values():
+                        continue
+                    ob_dist = obstacle_prediction.predicted_trajectory[0].location.distance(traj.trajectory[0].location)
+                    if ob_dist < min_dist:
+                        min_dist = ob_dist
+                        self.detectID_convert_gtID[obstacle_prediction.id] = gt_id
+            if obstacle_prediction.id not in self.detectID_convert_gtID:
+                continue
             predicted_trajectory = [
                 Vector2D(transform.location.x, transform.location.y)
                 for transform in obstacle_prediction.predicted_trajectory
@@ -130,7 +151,8 @@ class PredictionEvalOperator(erdos.Operator):
             ground_trajectory = [
                 Vector2D(transform.location.x, transform.location.y)
                 for transform in ground_trajectories[
-                    obstacle_prediction.id].trajectory
+                    # obstacle_prediction.id].trajectory
+                    self.detectID_convert_gtID[obstacle_prediction.id]].trajectory
             ]
             if obstacle_prediction.is_vehicle():
                 vehicle_cnt += 1
@@ -202,3 +224,18 @@ class PredictionEvalOperator(erdos.Operator):
                 time_epoch_ms(), sim_time, vehicle_ade))
             self._csv_logger.info('{},{},prediction,vehicle-FDE,{:.4f}'.format(
                 time_epoch_ms(), sim_time, vehicle_fde))
+        with open(os.path.join(self._data_path, f'prediction_eval-{sim_time}.json'), 'w') as f:
+            res = {}
+            if actor_cnt > 0:
+                res = {
+                    'MSD': msd,
+                    'ADE': ade,
+                    'FDE': fde,
+                    'person_MSD': person_msd,
+                    'person_ADE': person_ade,
+                    'person_FDE': person_fde,
+                    'vehicle_MSD': vehicle_msd,
+                    'vehicle_ADE': vehicle_ade,
+                    'vehicle_FDE': vehicle_fde,
+                }
+            json.dump(res, f)

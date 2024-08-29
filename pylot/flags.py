@@ -157,6 +157,8 @@ flags.DEFINE_bool('ignore_traffic_light', False,
 ########################################
 # Recording operators.
 ########################################
+
+
 def get_default_data_path():
     """Returns the default data path as data/<current_timestamp>."""
     now = datetime.datetime.now()
@@ -540,3 +542,50 @@ flags.register_multi_flags_validator(
 flags.DEFINE_bool(
     'fake_tracking_w_gt', False,
     'Whether to use perfect obstacle detection.')
+flags.DEFINE_bool(
+    'log_prediction_with_all_gt', False,
+    'whether to log prediction with ground truth'
+)
+
+
+
+flags.DEFINE_bool('log_rgb_camera', False,
+                  'True to enable center camera RGB logging')
+flags.DEFINE_bool('log_segmented_camera', False,
+                  'True to enable center segmented camera logging')
+flags.DEFINE_bool('log_left_right_cameras', False,
+                  'Control whether we log left and right cameras.')
+flags.DEFINE_bool('log_depth_camera', False,
+                  'True to enable depth camera logging')
+flags.DEFINE_bool('log_gnss', False, 'Enable logging of GNSS measurements.')
+flags.DEFINE_bool('log_pose', False, 'Enable logging of pose measurements.')
+flags.DEFINE_bool('log_imu', False, 'Enable logging of IMU measurements.')
+flags.DEFINE_bool('log_lidar', False, 'True to enable lidar logging')
+flags.DEFINE_bool('log_obstacles', False,
+                  'True to enable obstacle bounding box logging')
+flags.DEFINE_bool(
+    'log_traffic_lights', False,
+    'True to enable traffic lights bounding box and camera logging')
+flags.DEFINE_bool('log_multiple_object_tracker', False,
+                  'True to enable logging in the MOT format')
+flags.DEFINE_bool('log_trajectories', False,
+                  'True to enable trajectory logging')
+flags.DEFINE_bool('log_chauffeur', False,
+                  'True to log data in ChauffeurNet style.')
+flags.DEFINE_bool('log_top_down_segmentation', False,
+                  'True to enable logging of top down segmentation')
+
+flags.DEFINE_bool('log_obstacles_fake', False,
+                  'True to enable obstacle bounding box logging')
+flags.DEFINE_bool('log_predictions', False,
+                  'True to enable prediction logging')
+flags.DEFINE_bool('log_predictions_fake', False,
+                  'True to enable prediction logging')
+flags.DEFINE_bool('log_waypoints', False,
+                  'True to enable waypoints logging')
+flags.DEFINE_bool('log_waypoints_fake', False,
+                  'True to enable waypoints logging')
+flags.DEFINE_bool('log_obstacle_with_location', False,
+                  'True to enable obstacle with location logging')
+flags.DEFINE_bool('log_obstacle_history', False,
+                  'True to enable obstacle history logging')

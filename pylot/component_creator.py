@@ -93,7 +93,7 @@ def add_obstacle_detection(center_camera_stream,
         else:
             obstacles_stream = obstacles_stream_wo_depth
 
-    if FLAGS.perfect_obstacle_detection or FLAGS.evaluate_obstacle_detection or FLAGS.custom_obstacle_detection_eval:
+    if FLAGS.perfect_obstacle_detection or FLAGS.evaluate_obstacle_detection:# or FLAGS.custom_obstacle_detection_eval:
         assert (pose_stream is not None and depth_camera_stream is not None
                 and segmented_camera_stream is not None
                 and ground_obstacles_stream is not None
@@ -128,17 +128,20 @@ def add_obstacle_detection(center_camera_stream,
 
     return obstacles_stream, perfect_obstacles_stream
 
+
 def add_obstacle_detection_fake(obstacle_stream):
     obstacle_detection_stream_fake = pylot.operator_creator.add_obstacle_detection_fake(
         obstacle_stream
     )
     return obstacle_detection_stream_fake
 
+
 def add_obstacle_with_location(obstacle_stream, depth_stream, pose_stream, camera_setup):
     obstacles_with_location_stream = pylot.operator_creator.add_obstacle_location_finder(
         obstacle_stream, depth_stream, pose_stream, camera_setup
     )
     return obstacles_with_location_stream
+
 
 def add_traffic_light_detection(tl_transform,
                                 vehicle_id_stream,
@@ -415,14 +418,15 @@ def add_obstacle_tracking(center_camera_stream,
 
     return obstacles_tracking_stream
 
+
 def add_obstacle_tracking_w_GThistory_perception(center_camera_stream,
-                          center_camera_setup,
-                          obstacles_stream,
-                          depth_stream=None,
-                          vehicle_id_stream=None,
-                          pose_stream=None,
-                          ground_obstacles_stream=None,
-                          time_to_decision_stream=None):
+                                                 center_camera_setup,
+                                                 obstacles_stream,
+                                                 depth_stream=None,
+                                                 vehicle_id_stream=None,
+                                                 pose_stream=None,
+                                                 ground_obstacles_stream=None,
+                                                 time_to_decision_stream=None):
     if FLAGS.tracker_type == 'center_track':
         logger.debug('Using CenterTrack obstacle tracker...')
         obstacles_wo_history_tracking_stream = \
@@ -443,17 +447,16 @@ def add_obstacle_tracking_w_GThistory_perception(center_camera_stream,
     logger.debug('Adding operator to compute obstacle location history and perception info...')
     perfect_tracking_stream = \
         pylot.operator_creator.add_perfect_tracking(
-                vehicle_id_stream, ground_obstacles_stream, pose_stream)
+            vehicle_id_stream, ground_obstacles_stream, pose_stream)
     obstacles_tracking_stream = \
         pylot.operator_creator.add_obstacle_tracking_w_gt(
             obstacles_wo_history_tracking_stream,
             depth_stream,
             pose_stream,
-            perfect_tracking_stream, 
+            perfect_tracking_stream,
             center_camera_setup
         )
     return obstacles_tracking_stream
-    
 
 
 def add_segmentation(center_camera_stream, ground_segmented_stream=None):
@@ -500,7 +503,8 @@ def add_prediction(obstacles_tracking_stream,
                    release_sensor_stream=None,
                    pose_stream=None,
                    point_cloud_stream=None,
-                   lidar_setup=None):
+                   lidar_setup=None,
+                   eval_name='prediction_eval_operator'):
     """Adds prediction operators.
 
     Args:
@@ -544,7 +548,8 @@ def add_prediction(obstacles_tracking_stream,
             assert pose_stream is not None
             logger.debug('Adding prediction evaluation...')
             pylot.operator_creator.add_prediction_evaluation(
-                pose_stream, obstacles_tracking_stream, prediction_stream)
+                pose_stream, obstacles_tracking_stream, prediction_stream,
+                name=eval_name)
         if FLAGS.visualize_prediction:
             logger.debug('Adding for prediction evaluation...')
             # Add bird's eye camera.

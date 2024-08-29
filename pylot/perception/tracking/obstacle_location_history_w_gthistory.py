@@ -8,6 +8,7 @@ import os
 import json
 from carla import Vehicle
 
+
 class ObstacleLocationWGThistoryOperator(erdos.Operator):
     def __init__(self, obstacles_stream, depth_stream, pose_stream,
                  GT_history_stream,
@@ -32,7 +33,7 @@ class ObstacleLocationWGThistoryOperator(erdos.Operator):
         self._csv_logger = erdos.utils.setup_csv_logging(
             self.config.name + '-csv', self.config.csv_log_file_name)
         self.detectID_convert_gtID = {}
-        
+
     @staticmethod
     def connect(obstacles_stream, depth_stream, pose_stream, GT_history_stream):
         tracked_obstacles_stream = erdos.WriteStream()
@@ -46,14 +47,14 @@ class ObstacleLocationWGThistoryOperator(erdos.Operator):
         GT_history_msg = self._GT_history_msgs.popleft()
         history_traj = GT_history_msg.obstacle_trajectories
         """covert history traj from center to nail"""
-        with open(os.path.join(self._flags.data_path, 'actors', f'actors-{timestamp.coordinates[0]}.json'), 'r') as f:
-            actor_gt = json.load(f)
-        for i, ht in enumerate(history_traj):
-            ob_id = str(ht.obstacle.id)
-            if ob_id not in actor_gt:
-                continue
-            for j, traj in enumerate(ht.trajectory):
-                history_traj[i].trajectory[j].location.x -= actor_gt[ob_id]['extent']['x']
+        # with open(os.path.join(self._flags.data_path, 'actors', f'actors-{timestamp.coordinates[0]}.json'), 'r') as f:
+        #     actor_gt = json.load(f)
+        # for i, ht in enumerate(history_traj):
+        #     ob_id = str(ht.obstacle.id)
+        #     if ob_id not in actor_gt:
+        #         continue
+        #     for j, traj in enumerate(ht.trajectory):
+        #         history_traj[i].trajectory[j].location.x -= actor_gt[ob_id]['extent']['x']
         """TODO: here we only concern same direct with x extent, may determine the y extent when need"""
 
         obstacles_with_location = get_obstacle_locations(
@@ -94,7 +95,6 @@ class ObstacleLocationWGThistoryOperator(erdos.Operator):
             ObstacleTrajectoriesMessage(timestamp, history_traj))
         tracked_obstacles_stream.send(erdos.WatermarkMessage(timestamp))
 
-    
     def destroy(self):
         self._logger.warn('destroying {}'.format(self.config.name))
 

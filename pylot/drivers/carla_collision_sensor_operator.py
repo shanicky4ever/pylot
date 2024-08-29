@@ -54,7 +54,6 @@ class CarlaCollisionSensorDriverOperator(erdos.Operator):
         _, world = get_world(self._flags.simulator_host,
                              self._flags.simulator_port,
                              self._flags.simulator_timeout)
-
         self._vehicle = get_vehicle_handle(world, vehicle_id)
 
         # Install the collision sensor.

@@ -1,7 +1,7 @@
 rm pylot.log
 rm pylot.csv
 
-export TF_CPP_MIN_LOG_LEVEL=1
+export TF_CPP_MIN_LOG_LEVEL=2
 
 carla_device=0
 pylot_device=0

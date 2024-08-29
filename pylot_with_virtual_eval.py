@@ -17,54 +17,52 @@ import os
 import shutil
 
 #flags.DEFINE_list('goal_location', '234, 59, 39', 'Ego-vehicle goal location')
-flags.DEFINE_bool('log_rgb_camera', False,
-                  'True to enable center camera RGB logging')
-flags.DEFINE_bool('log_segmented_camera', False,
-                  'True to enable center segmented camera logging')
-flags.DEFINE_bool('log_left_right_cameras', False,
-                  'Control whether we log left and right cameras.')
-flags.DEFINE_bool('log_depth_camera', False,
-                  'True to enable depth camera logging')
-flags.DEFINE_bool('log_gnss', False, 'Enable logging of GNSS measurements.')
-flags.DEFINE_bool('log_pose', False, 'Enable logging of pose measurements.')
-flags.DEFINE_bool('log_imu', False, 'Enable logging of IMU measurements.')
-flags.DEFINE_bool('log_lidar', False, 'True to enable lidar logging')
-flags.DEFINE_bool('log_obstacles', False,
-                  'True to enable obstacle bounding box logging')
-flags.DEFINE_bool(
-    'log_traffic_lights', False,
-    'True to enable traffic lights bounding box and camera logging')
-flags.DEFINE_bool('log_multiple_object_tracker', False,
-                  'True to enable logging in the MOT format')
-flags.DEFINE_bool('log_trajectories', False,
-                  'True to enable trajectory logging')
-flags.DEFINE_bool('log_chauffeur', False,
-                  'True to log data in ChauffeurNet style.')
-flags.DEFINE_bool('log_top_down_segmentation', False,
-                  'True to enable logging of top down segmentation')
+# flags.DEFINE_bool('log_rgb_camera', False,
+#                   'True to enable center camera RGB logging')
+# flags.DEFINE_bool('log_segmented_camera', False,
+#                   'True to enable center segmented camera logging')
+# flags.DEFINE_bool('log_left_right_cameras', False,
+#                   'Control whether we log left and right cameras.')
+# flags.DEFINE_bool('log_depth_camera', False,
+#                   'True to enable depth camera logging')
+# flags.DEFINE_bool('log_gnss', False, 'Enable logging of GNSS measurements.')
+# flags.DEFINE_bool('log_pose', False, 'Enable logging of pose measurements.')
+# flags.DEFINE_bool('log_imu', False, 'Enable logging of IMU measurements.')
+# flags.DEFINE_bool('log_lidar', False, 'True to enable lidar logging')
+# flags.DEFINE_bool('log_obstacles', False,
+#                   'True to enable obstacle bounding box logging')
+# flags.DEFINE_bool(
+#     'log_traffic_lights', False,
+#     'True to enable traffic lights bounding box and camera logging')
+# flags.DEFINE_bool('log_multiple_object_tracker', False,
+#                   'True to enable logging in the MOT format')
+# flags.DEFINE_bool('log_trajectories', False,
+#                   'True to enable trajectory logging')
+# flags.DEFINE_bool('log_chauffeur', False,
+#                   'True to log data in ChauffeurNet style.')
+# flags.DEFINE_bool('log_top_down_segmentation', False,
+#                   'True to enable logging of top down segmentation')
 
-flags.DEFINE_bool('log_obstacles_fake', False,
-                  'True to enable obstacle bounding box logging')
-flags.DEFINE_bool('log_predictions', False,
-                  'True to enable prediction logging')
-flags.DEFINE_bool('log_predictions_fake', False,
-                  'True to enable prediction logging')
-flags.DEFINE_bool('log_waypoints', False,
-                  'True to enable waypoints logging')
-flags.DEFINE_bool('log_waypoints_fake', False,
-                  'True to enable waypoints logging')
-flags.DEFINE_bool('log_obstacle_with_location', False,
-                  'True to enable obstacle with location logging')
-flags.DEFINE_bool('log_obstacle_history', False,
-                  'True to enable obstacle history logging')
+# flags.DEFINE_bool('log_obstacles_fake', False,
+#                   'True to enable obstacle bounding box logging')
+# flags.DEFINE_bool('log_predictions', False,
+#                   'True to enable prediction logging')
+# flags.DEFINE_bool('log_predictions_fake', False,
+#                   'True to enable prediction logging')
+# flags.DEFINE_bool('log_waypoints', False,
+#                   'True to enable waypoints logging')
+# flags.DEFINE_bool('log_waypoints_fake', False,
+#                   'True to enable waypoints logging')
+# flags.DEFINE_bool('log_obstacle_with_location', False,
+#                   'True to enable obstacle with location logging')
+# flags.DEFINE_bool('log_obstacle_history', False,
+#                   'True to enable obstacle history logging')
 
 
 FLAGS = flags.FLAGS
 
 # The location of the center camera relative to the ego-vehicle.
 # CENTER_CAMERA_LOCATION = pylot.utils.Location(1.3, 0.0, 1.8)
-
-
 
 
 def driver():
@@ -162,14 +160,14 @@ def driver():
         raise ValueError(
             'Unknown --obstacle_location_finder_sensor value {}'.format(
                 FLAGS.obstacle_location_finder_sensor))
-    
+
     if FLAGS.log_rgb_camera:
         pylot.operator_creator.add_camera_logging(
             center_camera_stream, 'center_camera_logger_operator', 'center')
 
     if FLAGS.log_segmented_camera:
         pylot.operator_creator.add_camera_logging(
-            #segmented_stream, 
+            # segmented_stream,
             ground_segmented_stream,
             'center_segmented_camera_logger_operator',
             'segmented')
@@ -194,7 +192,7 @@ def driver():
                                   rotation=pylot.utils.Rotation()),
             vehicle_id_stream)
         if FLAGS.log_gnss:
-             pylot.operator_creator.add_gnss_logging(gnss_stream)
+            pylot.operator_creator.add_gnss_logging(gnss_stream)
 
     if FLAGS.localization:
         pose_stream = pylot.operator_creator.add_localization(
@@ -214,7 +212,7 @@ def driver():
     if FLAGS.log_multiple_object_tracker:
         pylot.operator_creator.add_multiple_object_tracker_logging(
             obstacles_stream)
-        
+
     if FLAGS.custom_obstacle_detection_eval:
         pylot.operator_creator.add_custom_obstacle_detection_eval(obstacles_stream, perfect_obstacles_stream)
 
@@ -239,13 +237,12 @@ def driver():
         center_camera_stream, center_camera_setup, obstacles_stream,
         depth_stream, vehicle_id_stream, pose_stream, ground_obstacles_stream,
         time_to_decision_loop_stream)
-    
+
     if FLAGS.log_obstacle_with_location:
         obs_with_loc_stream = pylot.component_creator.add_obstacle_with_location(
             obstacles_stream, depth_stream, pose_stream, center_camera_setup)
         pylot.operator_creator.add_obstacle_with_location_logging(
             obs_with_loc_stream, 'obstacles_with_location')
-
 
     if FLAGS.log_chauffeur or FLAGS.log_top_down_segmentation:
         top_down_transform = pylot.utils.get_top_down_transform(
@@ -278,7 +275,7 @@ def driver():
                 vehicle_id_stream, pose_stream, obstacles_tracking_stream,
                 top_down_camera_stream, top_down_segmented_stream,
                 top_down_camera_setup)
-    
+
     if FLAGS.log_trajectories:
         pylot.operator_creator.add_trajectory_logging(
             obstacles_tracking_stream)
@@ -295,12 +292,13 @@ def driver():
         pylot.component_creator.add_prediction(
             obstacles_tracking_stream, vehicle_id_stream,
             time_to_decision_loop_stream, transform, release_sensor_stream,
-            pose_stream, point_cloud_stream, lidar_setup)
+            pose_stream, point_cloud_stream, lidar_setup,
+            eval_name='prediction_eval')
     if prediction_stream is None:
         prediction_stream = obstacles_stream
     if notify_prediction_stream:
         notify_streams.append(notify_prediction_stream)
-    
+
     if FLAGS.log_predictions:
         pylot.operator_creator.add_prediction_logging(prediction_stream,
                                                       'predictions')
@@ -315,27 +313,39 @@ def driver():
     if FLAGS.log_waypoints:
         pylot.operator_creator.add_waypoints_logging(waypoints_stream,
                                                      'waypoint')
-        
-    if FLAGS.fake_tracking_w_gt:
-        obstacle_tracking_stream_w_gt = pylot.component_creator.add_obstacle_tracking_w_GThistory_perception(
-            center_camera_stream, center_camera_setup, obstacles_stream,
-        depth_stream, vehicle_id_stream, pose_stream, 
-        ground_obstacles_stream,
-        time_to_decision_loop_stream)
-        if FLAGS.log_trajectories:
-            pylot.operator_creator.add_trajectory_logging(
-                obstacle_tracking_stream_w_gt, 
-                name="trajectory_w_gt")
-        prediction_stream_w_gt, prediction_camera_stream_w_gt, notify_prediction_stream_w_gt = pylot.component_creator.add_prediction(
-            obstacle_tracking_stream_w_gt, vehicle_id_stream,
-            time_to_decision_loop_stream, transform, release_sensor_stream,
-            pose_stream, point_cloud_stream, lidar_setup)
-        if prediction_stream_w_gt is None:
-            prediction_stream_w_gt = obstacles_stream
-        if notify_prediction_stream_w_gt:
-            notify_streams.append(notify_prediction_stream_w_gt)
-        if FLAGS.log_predictions:
-            pylot.operator_creator.add_prediction_logging(prediction_stream_w_gt,'prediction_w_gt')                                 
+
+    # if FLAGS.fake_tracking_w_gt:
+    #     obstacle_tracking_stream_w_gt = pylot.component_creator.add_obstacle_tracking_w_GThistory_perception(
+    #         center_camera_stream, center_camera_setup, obstacles_stream,
+    #         depth_stream, vehicle_id_stream, pose_stream,
+    #         ground_obstacles_stream,
+    #         time_to_decision_loop_stream)
+    #     if FLAGS.log_trajectories:
+    #         pylot.operator_creator.add_trajectory_logging(
+    #             obstacle_tracking_stream_w_gt,
+    #             name="trajectory_w_gt")
+    #     prediction_stream_w_gt, prediction_camera_stream_w_gt, notify_prediction_stream_w_gt = pylot.component_creator.add_prediction(
+    #         obstacle_tracking_stream_w_gt, vehicle_id_stream,
+    #         time_to_decision_loop_stream, transform, release_sensor_stream,
+    #         pose_stream, point_cloud_stream, lidar_setup,
+    #         eval_name='prediction_w_gt_eval')
+    #     if prediction_stream_w_gt is None:
+    #         prediction_stream_w_gt = obstacles_stream
+    #     if notify_prediction_stream_w_gt:
+    #         notify_streams.append(notify_prediction_stream_w_gt)
+    #     if FLAGS.log_predictions:
+    #         pylot.operator_creator.add_prediction_logging(prediction_stream_w_gt, 'prediction_w_gt')
+    if FLAGS.log_prediction_with_all_gt:
+        perfect_tracking_stream = \
+            pylot.operator_creator.add_perfect_tracking(
+                vehicle_id_stream, ground_obstacles_stream, pose_stream)
+        prediction_with_all_gt_stream, _, _ = \
+            pylot.component_creator.add_prediction(
+                perfect_tracking_stream,
+                vehicle_id_stream,
+                time_to_decision_loop_stream, transform, release_sensor_stream,
+                pose_stream, point_cloud_stream, lidar_setup)
+        pylot.operator_creator.add_prediction_logging(prediction_with_all_gt_stream, 'prediction_with_all_gt')
 
     if FLAGS.simulator_mode == "pseudo-asynchronous":
         # Add a synchronizer in the pseudo-asynchronous mode.

@@ -70,7 +70,10 @@ class CarlaTrafficLightInvasionSensorOperator(erdos.Operator):
         location = Location(transform.location.x, transform.location.y,
                             transform.location.z)
 
-        veh_extent = self._vehicle.bounding_box.extent.x
+        if self._vehicle:
+            veh_extent = self._vehicle.bounding_box.extent.x
+        else:
+            return
 
         tail_close_pt = Vector3D(-0.8 * veh_extent, 0.0, location.z).rotate(
             transform.rotation.yaw).as_simulator_vector()

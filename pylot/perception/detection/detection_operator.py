@@ -1,12 +1,10 @@
 """Implements an operator that detects obstacles."""
-import logging
 import time
 
 import erdos
 
 import numpy as np
 
-import pylot.utils
 from pylot.perception.detection.obstacle import Obstacle
 from pylot.perception.detection.utils import BoundingBox2D, \
     OBSTACLE_LABELS, load_coco_bbox_colors, load_coco_labels
@@ -31,6 +29,7 @@ class DetectionOperator(erdos.Operator):
         model_path(:obj:`str`): Path to the model pb file.
         flags (absl.flags): Object to be used to access absl flags.
     """
+
     def __init__(self, camera_stream: erdos.ReadStream,
                  time_to_decision_stream: erdos.ReadStream,
                  obstacles_stream: erdos.WriteStream, model_path: str, flags):
@@ -42,18 +41,26 @@ class DetectionOperator(erdos.Operator):
                                                  self.config.log_file_name)
         self._obstacles_stream = obstacles_stream
 
-        pylot.utils.set_tf_loglevel(logging.ERROR)
-
+        # pylot.utils.set_tf_loglevel(logging.ERROR)
         # Only sets memory growth for flagged GPU
+        self._logger.info(f"GPU is {self._flags.obstacle_detection_gpu_index}")
         physical_devices = tf.config.experimental.list_physical_devices('GPU')
-        tf.config.experimental.set_visible_devices(
-            [physical_devices[self._flags.obstacle_detection_gpu_index]],
-            'GPU')
-        tf.config.experimental.set_memory_growth(
-            physical_devices[self._flags.obstacle_detection_gpu_index], True)
-
+        # tf.config.experimental.set_visible_devices(
+        #     [physical_devices[self._flags.obstacle_detection_gpu_index]],
+        #     'GPU')
+        self._logger.info(f"gpu device{physical_devices[self._flags.obstacle_detection_gpu_index]}")
+        logical_devices = tf.config.list_logical_devices()
+        for device in logical_devices:
+            self._logger.info(f'Logical device {device.name} is on physical device {device.device_type}')
+        # tf.config.experimental.set_memory_growth(
+        #     physical_devices[self._flags.obstacle_detection_gpu_index], True)
+        # tf.config.threading.set_intra_op_parallelism_threads(8)
         # Load the model from the saved_model format file.
         self._model = tf.saved_model.load(model_path)
+        self._logger.info(f'{physical_devices[self._flags.obstacle_detection_gpu_index]}')
+        logical_devices = tf.config.list_logical_devices()
+        for device in logical_devices:
+            self._logger.info(f'Logical device {device.name} is on physical device {device.device_type}')
 
         self._coco_labels = load_coco_labels(self._flags.path_coco_labels)
         self._bbox_colors = load_coco_bbox_colors(self._coco_labels)
@@ -63,9 +70,9 @@ class DetectionOperator(erdos.Operator):
             self._msg_cnt = 0
             self._data_path = os.path.join(self._flags.data_path, 'detector')
             os.makedirs(self._data_path, exist_ok=True)
-
         # Serve some junk image to load up the model.
         self.__run_model(np.zeros((108, 192, 3), dtype='uint8'))
+
 
     @staticmethod
     def connect(camera_stream: erdos.ReadStream,
@@ -130,9 +137,9 @@ class DetectionOperator(erdos.Operator):
                                     msg.frame.camera_setup.height),
                                 int(res_boxes[i][2] *
                                     msg.frame.camera_setup.height)),
-                                     res_scores[i],
-                                     self._coco_labels[res_classes[i]],
-                                     id=self._unique_id))
+                                res_scores[i],
+                                self._coco_labels[res_classes[i]],
+                                id=self._unique_id))
                         self._unique_id += 1
                     else:
                         self._logger.warning(
@@ -167,6 +174,9 @@ class DetectionOperator(erdos.Operator):
 
         infer = self._model.signatures['serving_default']
         result = infer(tf.convert_to_tensor(value=image_np_expanded))
+
+        for key, value in result.items():
+            self._logger.info(f'{key} is on device: {value.device}')
 
         boxes = result['boxes']
         scores = result['scores']

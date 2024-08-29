@@ -579,12 +579,16 @@ def get_detected_traffic_stops(traffic_stops, depth_frame):
 
 def get_vehicle_handle(world, vehicle_id: int):
     num_tries = 0
+    
     while num_tries < 50:
-        vehicle = world.get_actors().find(vehicle_id)
-        if vehicle:
-            return vehicle
-        time.sleep(0.5)
-        num_tries += 1
+        try:
+            vehicle = world.get_actors().find(vehicle_id)
+            if vehicle:
+                return vehicle
+        #if vehicle:
+        except Exception:      
+            time.sleep(0.5)
+            num_tries += 1
     raise ValueError("There was an issue finding the vehicle.")
 
 

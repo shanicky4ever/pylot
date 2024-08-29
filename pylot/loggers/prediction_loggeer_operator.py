@@ -23,7 +23,7 @@ class PredictionLoggerOperator(erdos.Operator):
         self._msg_cnt += 1
         if self._msg_cnt % self._flags.log_every_nth_message != 0:
             return
-        transfor_predictions = [pred.predicted_trajectory for pred in msg.predictions]
+        transfor_predictions = {pred.obstacle_trajectory.obstacle.id: pred.predicted_trajectory for pred in msg.predictions}
         assert len(msg.timestamp.coordinates) == 1
         timestamp = msg.timestamp.coordinates[0]
         file_name = os.path.join(self._data_path,
@@ -33,9 +33,9 @@ class PredictionLoggerOperator(erdos.Operator):
                       outfile, indent=4, separators=(',', ': '))
     
     def _get_log_format(self, prediction):
-        return [[{
+        return {pred_id: {idx: {
             'x': pred_t.location.x,
             'y': pred_t.location.y,
             'z': pred_t.location.z,
-        } for pred_t in pred] for pred in prediction]
+        } for idx, pred_t in enumerate(pred)} for pred_id, pred in prediction.items()}
     

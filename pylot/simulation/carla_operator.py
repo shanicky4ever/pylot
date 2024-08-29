@@ -385,7 +385,7 @@ class CarlaOperator(erdos.Operator):
         # Get all the actors in the simulation.
         actor_list = self._world.get_actors()
         if self._flags.log_actor_from_simulator:
-            self.log_actor_from_simulator(
+            log_actor_from_simulator(
                 actor_list,
                 timestamp,
                 os.path.join(self._flags.data_path, 'actors')
@@ -439,34 +439,34 @@ class CarlaOperator(erdos.Operator):
         v_pose.location.z = 5
         self._spectator.set_transform(v_pose)
 
-    def log_actor_from_simulator(self, actor_list, timestamp, data_path):
-        file_path = os.path.join(data_path, f"actors-{timestamp.coordinates[0]}.json")
-        data = {}
-        for actor in actor_list:
-            if isinstance(actor, Vehicle) or isinstance(actor, Walker):
-                name = str(actor.id)
-                if self._ego_vehicle.id == actor.id:
-                    name = 'hero'
-                data[name] = {
-                    'extent': {
-                        'x': actor.bounding_box.extent.x,
-                        'y': actor.bounding_box.extent.y,
-                        'z': actor.bounding_box.extent.z
-                    },
-                    'location': {
-                        'x': actor.get_location().x,
-                        'y': actor.get_location().y,
-                        'z': actor.get_location().z
-                    },
-                    'rotation': {
-                        'pitch': actor.get_transform().rotation.pitch,
-                        'roll': actor.get_transform().rotation.roll,
-                        'yaw': actor.get_transform().rotation.yaw
-                    }
+def log_actor_from_simulator(actor_list, timestamp, data_path):
+    file_path = os.path.join(data_path, f"actors-{timestamp.coordinates[0]}.json")
+    data = {}
+    for actor in actor_list:
+        if isinstance(actor, Vehicle) or isinstance(actor, Walker):
+            name = str(actor.id)
+            # if self._ego_vehicle.id == actor.id:
+            #     name = 'hero'
+            data[name] = {
+                'extent': {
+                    'x': actor.bounding_box.extent.x,
+                    'y': actor.bounding_box.extent.y,
+                    'z': actor.bounding_box.extent.z
+                },
+                'location': {
+                    'x': actor.get_location().x,
+                    'y': actor.get_location().y,
+                    'z': actor.get_location().z
+                },
+                'rotation': {
+                    'pitch': actor.get_transform().rotation.pitch,
+                    'roll': actor.get_transform().rotation.roll,
+                    'yaw': actor.get_transform().rotation.yaw
                 }
-        if len(data) > 0:
-            with open(file_path, 'w') as f:
-                json.dump(data, f)
+            }
+    if len(data) > 0:
+        with open(file_path, 'w') as f:
+            json.dump(data, f)
 
 
 

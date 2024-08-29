@@ -55,7 +55,7 @@ class BoundingBoxLoggerOperator(erdos.Operator):
         self._msg_cnt += 1
         if self._msg_cnt % self._flags.log_every_nth_message != 0:
             return
-        bboxes = [obstacle.get_in_log_format() for obstacle in msg.obstacles]
+        bboxes = [obstacle.get_in_log_format() for obstacle in msg.obstacles if obstacle.bounding_box_2D is not None]
         assert len(msg.timestamp.coordinates) == 1
         timestamp = msg.timestamp.coordinates[0]
         # Write the bounding boxes.
