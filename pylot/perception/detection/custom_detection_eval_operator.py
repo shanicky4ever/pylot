@@ -113,7 +113,7 @@ class CustomDetectionEvalOperator(erdos.Operator):
                                         "image_id":1,
                                         "category_id":self.labels[label],
                                         "bbox":[x, y, h, w],
-                                        "score":obs.confidence.numpy().item()})
+                                        "score":obs.confidence})#numpy().item()})
             else:
                 continue
         return detect_results

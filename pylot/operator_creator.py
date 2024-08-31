@@ -5,7 +5,7 @@ import erdos
 import pylot.utils
 
 # TODO: Hack to avoid a tensorflow import error.
-import tensorflow as tf  # noqa: F401
+#import tensorflow as tf  # noqa: F401
 
 FLAGS = flags.FLAGS
 
@@ -45,6 +45,7 @@ def add_efficientdet_obstacle_detection(camera_stream,
     return obstacles_streams
 
 
+
 def add_obstacle_detection(camera_stream,
                            time_to_decision_stream,
                            csv_file_name=None):
@@ -64,6 +65,7 @@ def add_obstacle_detection(camera_stream,
             [camera_stream, time_to_decision_stream],
             FLAGS.obstacle_detection_model_paths[i], FLAGS)
     return obstacles_streams
+
 
 def add_obstacle_detection_fake(obstacle_strem):
     from pylot.perception.detection.detection_fake_operator import DetectionFakeOperator
