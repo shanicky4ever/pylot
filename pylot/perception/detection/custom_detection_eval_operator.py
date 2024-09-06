@@ -67,7 +67,9 @@ class CustomDetectionEvalOperator(erdos.Operator):
                     coco_eval.accumulate()
                     #coco_eval.summarize()
                 res = {k: v for k, v in zip(self.keys, coco_eval.stats)}
-                res['iou'] = coco_eval.ious[(1,1)].tolist()
+                res['iou'] = coco_eval.ious[(1,1)]
+                if not isinstance(res['iou'],list):
+                    res['iou'] = res['iou'].tolist()
             else:
                 res = {}
             with open(os.path.join(self._data_path,f'detection_eval-{percpt[0]}.json'), 'w') as f:

@@ -10,6 +10,8 @@ import pylot.simulation.flags  # noqa: F401
 
 FLAGS = flags.FLAGS
 
+flags.DEFINE_integer('erdos_start_port', 9000, ' Starting port for erdos')
+
 # Files where to log information.
 flags.DEFINE_string('log_file_name', None, 'Name of the log file')
 flags.DEFINE_string('csv_log_file_name', None,
@@ -25,6 +27,7 @@ flags.DEFINE_enum(
 
 flags.DEFINE_bool('log_actor_from_simulator', False,
                   'True to log obstacle extents')
+
 
 ######################################################################
 # Perception
