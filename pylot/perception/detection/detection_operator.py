@@ -13,6 +13,7 @@ from pylot.perception.messages import ObstaclesMessage
 import tensorflow as tf
 import os
 print(tf.__version__)
+import random
 
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 tf.config.experimental.set_visible_devices(
@@ -90,6 +91,8 @@ class DetectionOperator(erdos.Operator):
             os.makedirs(self._data_path, exist_ok=True)
         # Serve some junk image to load up the model.
         self.__run_model(np.zeros((108, 192, 3), dtype='uint8'))
+        self.obstacles = []
+        self.next_availiable_time_stamp = 0
 
     @staticmethod
     def connect(camera_stream: erdos.ReadStream,
@@ -171,9 +174,16 @@ class DetectionOperator(erdos.Operator):
 
         # Get runtime in ms.
         runtime = (time.time() - start_time) * 1000
+        game_time = msg.timestamp.coordinates[0]
+        if game_time >= self.next_availiable_time_stamp:
+            if random.random() > self._flags.obstacle_detection_failure_ratio:
+                self.obstacles = obstacles
+            else:
+                self.next_availiable_time_stamp = game_time + \
+                    self._flags.obstacle_detection_failure_delay
         # Send out obstacles.
         obstacles_stream.send(
-            ObstaclesMessage(msg.timestamp, obstacles, runtime))
+            ObstaclesMessage(msg.timestamp, self.obstacles, runtime))
         obstacles_stream.send(erdos.WatermarkMessage(msg.timestamp))
 
         if self._flags.log_detector_output:

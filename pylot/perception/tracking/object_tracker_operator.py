@@ -4,6 +4,7 @@ from collections import deque
 import erdos
 
 from pylot.perception.messages import ObstaclesMessage
+import random
 
 
 class ObjectTrackerOperator(erdos.Operator):
@@ -50,6 +51,8 @@ class ObjectTrackerOperator(erdos.Operator):
         self._obstacles_msgs = deque()
         self._frame_msgs = deque()
         self._detection_update_count = -1
+        self.tracked_obstacles = None
+        self.next_availiable_time_stamp = 0
 
     @staticmethod
     def connect(obstacles_stream, camera_stream, time_to_decision_stream):
@@ -122,8 +125,17 @@ class ObjectTrackerOperator(erdos.Operator):
         tracker_delay = self.__compute_tracker_delay(timestamp.coordinates[0],
                                                      detector_runtime,
                                                      tracker_runtime)
+        game_time = timestamp.coordinates[0]
+        if self._flags.obstacle_tracking_failure_ratio == 0:
+            self.tracked_obstacles = tracked_obstacles
+        elif game_time >= self.next_availiable_time_stamp:
+            if self.tracked_obstacles is None or random.random() > self._flags.obstacle_tracking_failure_ratio:
+                self.tracked_obstacles = tracked_obstacles
+            else:
+                self.next_availiable_time_stamp = game_time + \
+                    self._flags.obstacle_tracking_failure_delay
         obstacle_tracking_stream.send(
-            ObstaclesMessage(timestamp, tracked_obstacles, tracker_delay))
+            ObstaclesMessage(timestamp, self.tracked_obstacles, tracker_delay))
 
     def __compute_tracker_delay(self, world_time, detector_runtime,
                                 tracker_runtime):

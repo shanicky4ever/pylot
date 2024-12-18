@@ -15,6 +15,8 @@ from pylot.planning.world import World
 from pylot.prediction.messages import PredictionMessage
 from pylot.prediction.obstacle_prediction import ObstaclePrediction
 
+import random
+
 
 class PlanningOperator(erdos.Operator):
     """Planning Operator.
@@ -92,6 +94,8 @@ class PlanningOperator(erdos.Operator):
         self._static_obstacles_msgs = deque()
         self._lanes_msgs = deque()
         self._ttd_msgs = deque()
+        self.output_wps = None
+        self.next_availiable_time_stamp = 0
 
     @staticmethod
     def connect(pose_stream: erdos.ReadStream,
@@ -210,7 +214,17 @@ class PlanningOperator(erdos.Operator):
             self._logger.debug('@{}: speed factor: {}'.format(
                 timestamp, speed_factor))
             output_wps.apply_speed_factor(speed_factor)
-        waypoints_stream.send(WaypointsMessage(timestamp, output_wps))
+
+        game_time = timestamp.coordinates[0]
+        if self._flags.plan_failure_ratio == 0:
+            self.output_wps = output_wps
+        elif game_time >= self.next_availiable_time_stamp:
+            if self.output_wps is None or random.random() > self._flags.plan_failure_ratio:
+                self.output_wps = output_wps
+            else:
+                self.next_availiable_time_stamp = game_time + \
+                    self._flags.plan_failure_delay
+        waypoints_stream.send(WaypointsMessage(timestamp, self.output_wps))
 
     def get_predictions(self, prediction_msg, ego_transform):
         """Extracts obstacle predictions out of the message.

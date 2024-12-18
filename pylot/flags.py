@@ -592,3 +592,39 @@ flags.DEFINE_bool('log_obstacle_with_location', False,
                   'True to enable obstacle with location logging')
 flags.DEFINE_bool('log_obstacle_history', False,
                   'True to enable obstacle history logging')
+
+
+flags.DEFINE_float(
+    'obstacle_detection_failure_ratio', 0,
+    'possiblity that obs detect fail'
+)
+flags.DEFINE_integer(
+    'obstacle_detection_failure_delay', 0,
+    'The delay when obstacle_detection fail'
+)
+flags.DEFINE_float(
+    'obstacle_tracking_failure_ratio', 0,
+    'possiblity that lane detect fail'
+)
+flags.DEFINE_integer(
+    'obstacle_tracking_failure_delay', 0,
+    'The delay when lane_detection fail'
+)
+
+flags.DEFINE_float(
+    'plan_failure_ratio', 0,
+    'possiblity that obs detect fail'
+)
+flags.DEFINE_integer(
+    'plan_failure_delay', 0,
+    'The delay when obstacle_detection fail'
+)
+
+flags.DEFINE_float(
+    'prediction_failure_ratio', 0,
+    'possiblity that obs detect fail'
+)
+flags.DEFINE_integer(
+    'prediction_failure_delay', 0,
+    'The delay when obstacle_detection fail'
+)

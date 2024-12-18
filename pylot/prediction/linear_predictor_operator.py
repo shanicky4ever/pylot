@@ -8,7 +8,7 @@ import numpy as np
 from pylot.prediction.messages import PredictionMessage
 from pylot.prediction.obstacle_prediction import ObstaclePrediction
 from pylot.utils import Location, Transform
-
+import random
 
 class LinearPredictorOperator(erdos.Operator):
     """Operator that implements a linear predictor.
@@ -34,6 +34,8 @@ class LinearPredictorOperator(erdos.Operator):
         self._logger = erdos.utils.setup_logging(self.config.name,
                                                  self.config.log_file_name)
         self._flags = flags
+        self.obstacle_predictions_list = None
+        self.next_availiable_time_stamp = 0
 
     @staticmethod
     def connect(tracking_stream: ReadStream,
@@ -111,5 +113,15 @@ class LinearPredictorOperator(erdos.Operator):
                 ObstaclePrediction(obstacle_trajectory,
                                    obstacle_trajectory.obstacle.transform, 1.0,
                                    predictions))
+            
+            # game_time = msg.timestamp.coordinates[0]
+            # if self._flags.prediction_failure_ratio == 0:
+            #     self.obstacle_predictions_list = obstacle_predictions_list
+            # elif game_time >= self.next_availiable_time_stamp:
+            #     if self.predictions is None or random.random() > self._flags.prediction_failure_ratio:
+            #         self.obstacle_predictions_list = obstacle_predictions_list
+            #     else:
+            #         self.next_availiable_time_stamp = game_time + \
+            #             self._flags.prediction_failure_delay
         linear_prediction_stream.send(
             PredictionMessage(msg.timestamp, obstacle_predictions_list))
